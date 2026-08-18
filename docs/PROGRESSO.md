@@ -10,7 +10,7 @@ marcos concluídos e validados
              13
 ```
 
-**Progresso: 0 / 13**
+**Progresso: 1 / 13**
 
 Este número só sobe. Progresso *dentro* de um marco não é progresso do projeto e não entra
 nesta conta. Quando este documento falar de um marco específico, ele diz explicitamente que é
@@ -22,7 +22,7 @@ sobre aquele marco.
 
 | # | Entregável | Validação | Status |
 |---|---|---|---|
-| **M0** | Estrutura sfdx, git na `main`, `.gitignore`, docs iniciais, deploy vazio validado | `sf project deploy validate` passa | 🔄 em andamento |
+| **M0** | Estrutura sfdx, git na `main`, `.gitignore`, docs iniciais, deploy vazio validado | `sf project deploy validate` passa | ✅ concluído |
 | **M1** | Modelo de dados: objetos, campos, relacionamentos, permission sets | metadata no repositório e na org | ⬜ |
 | **M2** | Seed data repetível dentro do orçamento da §33 | roda duas vezes sem duplicar; storage abaixo de 50% | ⬜ |
 | **M3** | Lead: captura, scoring, roteamento, conversão | um lead vira Account, Contact e Opportunity | ⬜ |
@@ -67,8 +67,8 @@ Escopo do marco:
 - [x] **`sf project deploy validate --test-level RunLocalTests` passa** — 3/3 testes, 100%,
       Deploy ID `0Affj00000NdJfCCAV`
 - [x] Branch local renomeada para `main`
-- [ ] Commit e push na `main`
-- [ ] Deploy aplicado na org
-- [ ] Pacote de evidências `docs/releases/R00/`
+- [x] Commit e push na `main`
+- [x] Deploy aplicado na org
+- [x] Pacote de evidências `docs/releases/R00/`
 
-**Fechamento:** _pendente — falta a integração do Probe_
+**Fechamento:** 2026-08-18 · commit `d115424` · evidência em `docs/releases/R00/`
