@@ -1,0 +1,42 @@
+# ==========================================================
+#  Northstar — Salesforce DX  |  .gitignore
+# ==========================================================
+
+# --- Salesforce CLI / auth (NUNCA versionar) ---
+.sfdx/
+.sf/
+.localdevserver/
+deploy-options.json
+**/*.sfdx-auth-url
+*.sfdx-auth-url
+
+# --- Segredos / chaves / certificados ---
+*.key
+*.pem
+*.crt
+*.p12
+*.jks
+.env
+.env.*
+auth.json
+
+# --- Retrieve temporário / logs ---
+**/unpackaged/
+*.log
+
+# --- OpenClaw / workspace do agente (não faz parte do projeto) ---
+AGENTS.md
+SOUL.md
+IDENTITY.md
+USER.md
+TOOLS.md
+HEARTBEAT.md
+openclaw-workspace-state.json
+*.disabled
+*.template-bak
+media/
+
+# --- Dependências / SO ---
+node_modules/
+package-lock.json
+.DS_Store
