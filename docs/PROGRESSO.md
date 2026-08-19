@@ -87,14 +87,28 @@ Escopo do marco:
 - [x] Deploy aplicado (`deploy quick` sobre validação do Kernel), 27/27 componentes, 0 erros
 - [x] Pacote de evidência `docs/releases/R01/`
 
+**Fatia (a) entregue — permission sets** (commit `a4185b9`, evidência em `docs/releases/R02/`):
+
+- [x] Os 8 permission sets da §30.2 (`NDG_Sales_Rep`, `NDG_Sales_Manager`,
+      `NDG_Regional_Director`, `NDG_Deal_Desk`, `NDG_RevOps`, `NDG_Integration_Admin`,
+      `NDG_Executive_ReadOnly`, `NDG_Salesforce_Admin_Extended`), confirmados na org via SOQL
+- [x] FLS explícita para os 24 campos comerciais de R01 — fecha a limitação (c) de
+      `docs/releases/R01/known-limitations.md` (campos que antes não eram visíveis para ninguém,
+      nem para o administrador)
+- [x] Margem e desconto verificados somente-leitura em todos os 8 permission sets, na org
+- [x] Nenhum permission set concede `View All Data` / `Modify All Data`
+- [x] Deploy aplicado (`deploy quick` sobre validação própria do Probe), 8/8 componentes, 0 erros
+- [x] Pacote de evidência `docs/releases/R02/`
+
 **Ainda falta para o M1 fechar** (§55 exige objetos, campos, relacionamentos e permission sets):
 
 - [ ] Objetos custom da §9 (`Sales_Quota__c`, `Quota_Attainment__c`, `Territory_Assignment__c`,
       `Discount_Request__c`, `Inventory_Snapshot__c`, `ERP_Sync_Log__c`, `Partner_Deal__c`, etc.)
 - [ ] Custom Metadata Types de política (preço/desconto/margem — §1.5, não consome data storage)
 - [ ] Big Object de observabilidade de integração (§1.5, não consome data storage)
-- [ ] Permission sets das 9 personas (§30.2) — sem eles, ninguém enxerga os campos e objetos
-      deste marco (ver `docs/releases/R01/known-limitations.md`, item c)
+- [ ] Permission tests (`System.runAs()`) por persona (§30.2 os torna obrigatórios) — ainda sem
+      lógica de negócio para exercitar; ver `docs/releases/R02/known-limitations.md`, item (c)
 
 **Desvio em vigor:** D-010 — Kernel produz a metadata declarativa desta fatia porque o agente
-`schema` não inicializa (P-15).
+`schema` não inicializa (P-15). Não se aplica à fatia (a): o Probe não teve visibilidade de qual
+agente produziu os permission sets, só confirmou que estavam corretos e os integrou.
