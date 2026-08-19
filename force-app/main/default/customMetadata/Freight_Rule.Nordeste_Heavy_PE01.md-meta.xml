@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <label>Nordeste Heavy PE01</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Region__c</field>
+        <value xsi:type="xsd:string">Nordeste</value>
+    </values>
+    <values>
+        <field>Warehouse_Code__c</field>
+        <value xsi:type="xsd:string">PE01</value>
+    </values>
+    <values>
+        <field>Weight_Band_From_Kg__c</field>
+        <value xsi:type="xsd:double">30.01</value>
+    </values>
+    <values>
+        <field>Weight_Band_To_Kg__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Order_Value_From__c</field>
+        <value xsi:type="xsd:double">0.00</value>
+    </values>
+    <values>
+        <field>Order_Value_To__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Freight_Amount__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Freight_Percent__c</field>
+        <value xsi:type="xsd:double">4.50</value>
+    </values>
+</CustomMetadata>

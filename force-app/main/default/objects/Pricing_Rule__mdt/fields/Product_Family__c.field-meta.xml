@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Product_Family__c</fullName>
+    <description>Product family the rule is restricted to. Empty matches any family.</description>
+    <externalId>false</externalId>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Product Family</label>
+    <length>50</length>
+    <required>false</required>
+    <unique>false</unique>
+    <type>Text</type>
+</CustomField>

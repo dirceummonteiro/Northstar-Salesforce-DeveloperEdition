@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Freight_Amount__c</fullName>
+    <description>Flat freight charge applied when the rule matches. Amount in BRL: Custom Metadata does not support the Currency type, so the value is a plain number.</description>
+    <externalId>false</externalId>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Freight Amount</label>
+    <precision>16</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <type>Number</type>
+</CustomField>

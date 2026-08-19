@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <label>Default Policy</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Product_Family__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Customer_Segment__c</field>
+        <value xsi:type="xsd:string">Any</value>
+    </values>
+    <values>
+        <field>Min_Gross_Margin_Percent__c</field>
+        <value xsi:type="xsd:double">18.00</value>
+    </values>
+    <values>
+        <field>Manager_Approval_Threshold__c</field>
+        <value xsi:type="xsd:double">5.00</value>
+    </values>
+    <values>
+        <field>Director_Approval_Threshold__c</field>
+        <value xsi:type="xsd:double">12.00</value>
+    </values>
+    <values>
+        <field>Deal_Desk_Threshold__c</field>
+        <value xsi:type="xsd:double">18.00</value>
+    </values>
+    <values>
+        <field>Effective_From__c</field>
+        <value xsi:type="xsd:date">2026-01-01</value>
+    </values>
+    <values>
+        <field>Effective_To__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>

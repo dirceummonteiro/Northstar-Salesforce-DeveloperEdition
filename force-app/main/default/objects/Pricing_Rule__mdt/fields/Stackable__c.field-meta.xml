@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Stackable__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Whether this discount adds to another matching rule instead of replacing it. Volume bands stack on top of the tier discount; tier discounts do not stack with each other.</description>
+    <externalId>false</externalId>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Stackable</label>
+    <type>Checkbox</type>
+</CustomField>

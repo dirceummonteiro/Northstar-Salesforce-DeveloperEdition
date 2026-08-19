@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Region__c</fullName>
+    <description>Destination region. Any matches every region.</description>
+    <externalId>false</externalId>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Region</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Any</fullName>
+                <default>false</default>
+                <label>Any</label>
+            </value>
+            <value>
+                <fullName>Norte</fullName>
+                <default>false</default>
+                <label>Norte</label>
+            </value>
+            <value>
+                <fullName>Nordeste</fullName>
+                <default>false</default>
+                <label>Nordeste</label>
+            </value>
+            <value>
+                <fullName>Centro-Oeste</fullName>
+                <default>false</default>
+                <label>Centro-Oeste</label>
+            </value>
+            <value>
+                <fullName>Sudeste</fullName>
+                <default>false</default>
+                <label>Sudeste</label>
+            </value>
+            <value>
+                <fullName>Sul</fullName>
+                <default>false</default>
+                <label>Sul</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Discount policy driven by customer tier, segment, product family and volume band. Lives in Custom Metadata so changing a pricing rule is a configuration change, never an Apex change, and so the policy costs nothing against the org data storage allocation.</description>
+    <label>Pricing Rule</label>
+    <pluralLabel>Pricing Rules</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>
