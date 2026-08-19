@@ -23,7 +23,7 @@ sobre aquele marco.
 | # | Entregável | Validação | Status |
 |---|---|---|---|
 | **M0** | Estrutura sfdx, git na `main`, `.gitignore`, docs iniciais, deploy vazio validado | `sf project deploy validate` passa | ✅ concluído |
-| **M1** | Modelo de dados: objetos, campos, relacionamentos, permission sets | metadata no repositório e na org | ⬜ |
+| **M1** | Modelo de dados: objetos, campos, relacionamentos, permission sets | metadata no repositório e na org | 🔄 em andamento |
 | **M2** | Seed data repetível dentro do orçamento da §33 | roda duas vezes sem duplicar; storage abaixo de 50% | ⬜ |
 | **M3** | Lead: captura, scoring, roteamento, conversão | um lead vira Account, Contact e Opportunity | ⬜ |
 | **M4** | Pipeline de Opportunity com produtos e price book | uma oportunidade completa pode ser montada | ⬜ |
@@ -72,3 +72,29 @@ Escopo do marco:
 - [x] Pacote de evidências `docs/releases/R00/`
 
 **Fechamento:** 2026-08-18 · commit `d115424` · evidência em `docs/releases/R00/`
+
+### M1 — Modelo de dados (em andamento)
+
+**Aberto em:** 2026-08-18
+
+**Fatia 1 entregue** (commit `b29e8e0`, evidência em `docs/releases/R01/`):
+
+- [x] 11 campos novos em `Account` (§9.2): segmento, tier, crédito, território, canal, sync ERP
+- [x] 13 campos novos em `Opportunity` (§9.3): margem, desconto, status de pricing/deal desk/
+      crédito/estoque, concorrente, motivo de perda
+- [x] Objeto `Quote` padrão habilitado (D-009/ADR-008), confirmado na org via
+      `SELECT COUNT() FROM Quote`
+- [x] Deploy aplicado (`deploy quick` sobre validação do Kernel), 27/27 componentes, 0 erros
+- [x] Pacote de evidência `docs/releases/R01/`
+
+**Ainda falta para o M1 fechar** (§55 exige objetos, campos, relacionamentos e permission sets):
+
+- [ ] Objetos custom da §9 (`Sales_Quota__c`, `Quota_Attainment__c`, `Territory_Assignment__c`,
+      `Discount_Request__c`, `Inventory_Snapshot__c`, `ERP_Sync_Log__c`, `Partner_Deal__c`, etc.)
+- [ ] Custom Metadata Types de política (preço/desconto/margem — §1.5, não consome data storage)
+- [ ] Big Object de observabilidade de integração (§1.5, não consome data storage)
+- [ ] Permission sets das 9 personas (§30.2) — sem eles, ninguém enxerga os campos e objetos
+      deste marco (ver `docs/releases/R01/known-limitations.md`, item c)
+
+**Desvio em vigor:** D-010 — Kernel produz a metadata declarativa desta fatia porque o agente
+`schema` não inicializa (P-15).
