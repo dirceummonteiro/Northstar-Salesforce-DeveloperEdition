@@ -38,6 +38,8 @@ openclaw-workspace-state.json
 *.disabled
 *.template-bak
 media/
+DREAMS.md
+memory/
 
 # --- Dependências / SO ---
 node_modules/
