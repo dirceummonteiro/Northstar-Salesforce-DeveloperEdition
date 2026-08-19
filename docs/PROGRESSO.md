@@ -100,15 +100,47 @@ Escopo do marco:
 - [x] Deploy aplicado (`deploy quick` sobre validação própria do Probe), 8/8 componentes, 0 erros
 - [x] Pacote de evidência `docs/releases/R02/`
 
+**Fatia (b) entregue — Custom Metadata Types de política** (commit `db3391d`, evidência em
+`docs/releases/R03/`):
+
+- [x] `Pricing_Rule__mdt` (§9.7, 11 campos) + 8 registros (4 tiers, 4 faixas de volume)
+- [x] `Margin_Policy__mdt` (§9.8, 9 campos) + 1 registro (`Default_Policy`)
+- [x] `Freight_Rule__mdt` (§9.16, 9 campos) + 2 registros (Nordeste, Sudeste)
+- [x] Confirmado na org via SOQL: 8 + 1 + 2 = 11 registros, batendo com os 11 arquivos entregues
+- [x] Deploy aplicado (validate + deploy completo com `RunLocalTests`), 65/65 componentes
+      (junto com a fatia (c)), 0 erros
+- [x] Pacote de evidência `docs/releases/R03/`
+
+**Fatia (c) entregue — `Discount_Request__c`** (commit `897cfef`, evidência em
+`docs/releases/R03/`):
+
+- [x] Objeto `Discount_Request__c` (§9.9, 13 campos), `sharingModel: ControlledByParent` via
+      master-detail para `Opportunity`
+- [x] `ObjectPermissions`/`FieldPermissions` adicionadas nos 7 permission sets `NDG_*`
+      existentes — FLS somente-leitura mantida nos campos de negociação sensíveis
+      (`Requested_Discount__c`, `Requested_Margin_Percent__c`, `Current_Margin_Percent__c`,
+      `Policy_Discount__c`) em todos os 7, confirmado na org
+- [x] **ESCALONAMENTO DE SEGURANÇA reportado ao Helix** — `viewAllRecords`/`modifyAllRecords`
+      por objeto (não permissão de sistema) introduzidos em `Discount_Request__c` (5 personas)
+      e em `Opportunity` (`NDG_Deal_Desk`); tabela de justificativa por persona em
+      `docs/releases/R03/release-summary.md`
+- [x] Deploy aplicado, confirmado na org (objeto existe, vazio — sem seed nesta fatia)
+- [x] Pacote de evidência `docs/releases/R03/`
+
 **Ainda falta para o M1 fechar** (§55 exige objetos, campos, relacionamentos e permission sets):
 
-- [ ] Objetos custom da §9 (`Sales_Quota__c`, `Quota_Attainment__c`, `Territory_Assignment__c`,
-      `Discount_Request__c`, `Inventory_Snapshot__c`, `ERP_Sync_Log__c`, `Partner_Deal__c`, etc.)
-- [ ] Custom Metadata Types de política (preço/desconto/margem — §1.5, não consome data storage)
+- [ ] Demais objetos custom da §9 (`Sales_Quota__c`, `Quota_Attainment__c`,
+      `Territory_Assignment__c`, `Inventory_Snapshot__c`, `ERP_Sync_Log__c`, `Partner_Deal__c`,
+      etc. — fora do escopo das fatias (b)/(c))
 - [ ] Big Object de observabilidade de integração (§1.5, não consome data storage)
 - [ ] Permission tests (`System.runAs()`) por persona (§30.2 os torna obrigatórios) — ainda sem
-      lógica de negócio para exercitar; ver `docs/releases/R02/known-limitations.md`, item (c)
+      lógica de negócio para exercitar; ver `docs/releases/R02/known-limitations.md`, item (c),
+      reafirmado em `docs/releases/R03/known-limitations.md`, item (c)
+- [ ] Confirmação explícita do Helix sobre a tabela de `viewAllRecords`/`modifyAllRecords`
+      introduzida na fatia (c) — ver `docs/releases/R03/known-limitations.md`, item (b)
 
 **Desvio em vigor:** D-010 — Kernel produz a metadata declarativa desta fatia porque o agente
-`schema` não inicializa (P-15). Não se aplica à fatia (a): o Probe não teve visibilidade de qual
-agente produziu os permission sets, só confirmou que estavam corretos e os integrou.
+`schema` não inicializa (P-15). Aplica-se às fatias (b) e (c): ambas chegaram prontas no working
+tree, produzidas pelo Kernel sob o mesmo desvio da fatia 1. Não se aplica à fatia (a): o Probe
+não teve visibilidade de qual agente produziu os permission sets, só confirmou que estavam
+corretos e os integrou.
