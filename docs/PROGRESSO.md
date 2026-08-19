@@ -136,8 +136,9 @@ Escopo do marco:
 - [ ] Permission tests (`System.runAs()`) por persona (§30.2 os torna obrigatórios) — ainda sem
       lógica de negócio para exercitar; ver `docs/releases/R02/known-limitations.md`, item (c),
       reafirmado em `docs/releases/R03/known-limitations.md`, item (c)
-- [ ] Confirmação explícita do Helix sobre a tabela de `viewAllRecords`/`modifyAllRecords`
-      introduzida na fatia (c) — ver `docs/releases/R03/known-limitations.md`, item (b)
+- [x] Confirmação explícita do Helix sobre a tabela de `viewAllRecords`/`modifyAllRecords`
+      introduzida na fatia (c) — ratificada como **D-011** em `docs/DECISIONS.md`; ver
+      `docs/releases/R03/known-limitations.md`, item (b)
 
 **Desvio em vigor:** D-010 — Kernel produz a metadata declarativa desta fatia porque o agente
 `schema` não inicializa (P-15). Aplica-se às fatias (b) e (c): ambas chegaram prontas no working
