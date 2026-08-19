@@ -19,6 +19,29 @@ persona. Não é permissão de sistema (`View All Data`/`Modify All Data`) e a r
 não encontrou nada fora do desenho documentado — mas é uma mudança real de superfície de
 sharing que o Helix deveria confirmar antes do M1 fechar, não só ler depois do fato.
 
+**Atualização:** confirmado. O Helix ratificou a concessão de `ViewAll` em Opportunity ao Deal
+Desk em `docs/DECISIONS.md`, **D-011**. Ver também item (f) abaixo — a concessão não foi uma
+escolha de design isolada, foi resposta a uma recusa de deploy da plataforma.
+
+## f) Duas recusas da plataforma durante esta fatia (não erros de conteúdo)
+
+A validação/deploy desta fatia parou duas vezes por regra de plataforma, não por dado errado:
+
+1. **`.md-meta.xml` sem `xmlns:xsd` quando algum `<value xsi:type="xsd:boolean">` está presente.**
+   A API 67.0 rejeita o pacote inteiro na fase de parse — antes de tocar qualquer componente —
+   com erro opaco, `numberComponentErrors: 0` e nenhuma pista de qual arquivo ou campo causou a
+   falha. Os 11 registros de Custom Metadata desta fatia usam `xsi:type="xsd:boolean"` (campo
+   `Active__c` em todos, `Stackable__c` em `Pricing_Rule__mdt`), então o namespace precisa estar
+   declarado mesmo que só `xmlns:xsi` pareça necessário à primeira vista. Runbook completo,
+   incluindo como bissetar esse erro, em `docs/runbooks/custom-metadata.md`.
+2. **`ViewAll` em `Discount_Request__c` (filho master-detail) exige `ViewAll` no pai
+   (`Opportunity`).** A plataforma recusou o deploy com a mensagem citada em D-011. Resolvido
+   ratificando a concessão em Opportunity para o Deal Desk — ver D-011 em `docs/DECISIONS.md` e
+   a atualização do item (b) acima.
+
+Nenhuma das duas é uma falha de conteúdo do modelo de dados; são restrições de plataforma que só
+aparecem no momento do deploy, não numa revisão estática do XML.
+
 ## c) Permission tests (`System.runAs()`) ainda não existem
 
 Mesma limitação (c) de R02, ainda aberta. A §30.2 é explícita: "permission tests are mandatory,
@@ -51,7 +74,7 @@ dados e o acesso por persona, conforme pedido pela tarefa.
 - **P-15** — agente `schema` não inicializa (D-010). Aplica-se aqui: esta fatia é mais uma
   produzida pelo Kernel sob o desvio D-010, com o cabeçalho de desvio confirmado na tarefa.
 
-Nenhuma das limitações acima bloqueia a integração desta fatia — mas (a) continua bloqueando,
-por desenho, o fechamento do M1 como marco, (b) merece confirmação explícita do Helix por ser
-uma mudança de superfície de segurança nova, e (c) é a mesma pendência de qualidade real de R02,
-ainda não fechada.
+Nenhuma das limitações acima bloqueia a integração desta fatia — (a) continua bloqueando, por
+desenho, o fechamento do M1 como marco; (b) foi confirmada pelo Helix via D-011; (c) é a mesma
+pendência de qualidade real de R02, ainda não fechada; (f) já está resolvida, documentada aqui
+para não custar uma hora de bisseção a quem tocar Custom Metadata de novo.

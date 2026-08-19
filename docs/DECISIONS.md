@@ -237,3 +237,47 @@ como P-15.
 **Se estiver errado:** o risco é o Kernel produzir metadata com vícios de quem pensa em Apex —
 por exemplo, resolver em código o que era para ser declarativo. Mitigação: as tarefas dele
 especificam campo a campo, e eu confiro os pontos sensíveis antes do Probe.
+
+---
+
+## D-011 — Deal Desk enxerga todas as oportunidades
+
+**Data:** 2026-08-19 · **Marco:** M1 (fatia 3) · **Status:** aplicada · **Corrige:** matriz de FLS da NS-M1-KERNEL-02
+
+`Discount_Request__c` é master-detail de Opportunity, com `sharingModel = ControlledByParent`.
+Ao deployar, a plataforma recusou:
+
+```
+A permissão Exibir todos os Discount_Request__c depende da(s) permissão(ões):
+Exibir todos os Opportunity
+```
+
+Minha matriz original dava ao `NDG_Deal_Desk` apenas `Read` e `Edit` em Opportunity, sem
+`ViewAllRecords`. O Kernel satisfez a dependência **concedendo `ViewAll` em Opportunity** ao Deal
+Desk.
+
+**Decisão: ratificar a concessão.**
+
+**Por quê — e por que minha matriz estava errada, não a solução dele:** a §4.4 define o Deal Desk
+como quem revisa exceções de preço de toda a operação, e a §17.4 exige um console com fila de
+pedidos, cliente, oportunidade, valor, desconto pedido e margem. Com OWD privada e sem `ViewAll`,
+o analista de Deal Desk enxergaria apenas as oportunidades das quais ele é dono — ou seja,
+nenhuma. **O console nasceria vazio.** A dependência da plataforma não ampliou escopo: ela expôs
+uma lacuna no meu desenho, onde eu tinha dado a permissão do pedido de desconto sem dar a do
+registro que lhe dá sentido.
+
+**O que a ratificação NÃO concede:** `ViewAll` é ler tudo, não `ModifyAll`. O Deal Desk continua
+sem poder editar o negócio. A FLS da fatia 2 permanece: dos campos sensíveis, ele edita apenas
+`Deal_Desk_Status__c`. Ele decide sobre o pedido; não reescreve a oportunidade. Preço, margem,
+tier e desconto seguem fora do alcance dele para escrita.
+
+**Quem tem `ViewAll` em Opportunity depois disto:** Deal Desk, Regional Director, RevOps,
+Integration Admin, Executive ReadOnly e Admin Extended. **Rep e Sales Manager continuam sem** —
+os dois enxergam pelo dono do registro e pela hierarquia, que é o comportamento correto para
+quem vende.
+
+**Se estiver errado:** o risco é vazamento lateral — um analista de Deal Desk lendo pipeline que
+não precisaria ver. É um risco real e aceito conscientemente: a alternativa é um console de
+aprovação que não mostra o que precisa aprovar. Se o modelo de sharing evoluir para regras por
+critério (§30.3), esta concessão deve ser reavaliada e possivelmente substituída por uma sharing
+rule que exponha só as oportunidades com pedido de desconto aberto.
