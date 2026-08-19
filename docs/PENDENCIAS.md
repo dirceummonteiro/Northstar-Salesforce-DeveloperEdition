@@ -43,6 +43,19 @@ o obstáculo é desenho de sharing, não compra de licença.
 | P-13 | Runbook de reautenticação PKCE manual do Salesforce | Não | Probe, antes do M12 |
 | P-14 | Definir licença do projeto (o `README` está com "TBD") | Não | Dirceu |
 | P-15 | **Agente `schema` não inicializa** — `WorkspaceVanishedError` após o rename forge → schema | Não (Kernel cobre, D-010) | Helix |
+| P-16 | `sf sobject describe` não reflete campos recém-deployados de forma confiável, mesmo fora de Big Object | Não (Tooling API resolve) | Probe |
+
+### P-16 — `sf sobject describe` truncado depois de deploy
+
+Na reconciliação de `docs/releases/R05/`, logo depois de um `sf project deploy start` bem
+sucedido (111/111 componentes, 0 erros), `sf sobject describe -s Discount_Request__c` mostrou só
+1 campo customizado (de 13) e `sf sobject describe -s Integration_Log__b` mostrou só 3 (de 17).
+`docs/releases/R04/known-limitations.md` já registrava esse comportamento para Big Object; esta
+fatia confirma que ele também aparece em `Discount_Request__c`, que é objeto comum. A Tooling API
+(`SELECT QualifiedApiName FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = '...'`)
+mostrou os campos completos nos dois casos, sem o mesmo atraso. **Regra prática para quem
+verificar campo por campo depois de um deploy: usar `FieldDefinition` via Tooling API, nunca
+`sf sobject describe` sozinho** — o describe local pode ler uma lacuna que não existe.
 
 ### P-15 — observação da fatia (d) do M1
 

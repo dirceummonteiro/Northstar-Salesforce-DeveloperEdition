@@ -159,6 +159,20 @@ Escopo do marco:
       introduzida na fatia (c) — ratificada como **D-011** em `docs/DECISIONS.md`; ver
       `docs/releases/R03/known-limitations.md`, item (b)
 
+**Reconciliação (b)-(d) confirmada** (evidência em `docs/releases/R05/`): rodada disparada
+porque o dono viu apenas um objeto customizado na org. Reconhecimento mostrou que `main` e
+`origin/main` já estavam idênticos (nada preso sem push) e que as quatro fatias (a)-(d) já
+existiam completas em `force-app/`. Deploy completo reaplicado (`sf project deploy validate` +
+`sf project deploy start`, 111/111 componentes, 0 erros, 3/3 testes) e conferido na org via
+Tooling API `FieldDefinition` (não pelo `sf sobject describe`, que truncou os campos logo após o
+deploy — ver P-16 em `docs/PENDENCIAS.md`): os 8 permission sets, os 11 registros de Custom
+Metadata, os 13 campos de `Discount_Request__c` e os 17 campos de `Integration_Log__b` estão
+todos presentes na org. Leitura mais provável da observação original: `Integration_Log__b` foi
+criado numa janela de menos de uma hora antes desta rodada, e Custom Metadata Types não aparecem
+no Object Manager padrão do Setup — quem olhou antes dessa criação via mesmo só
+`Discount_Request__c`. Não é uma confirmação retroativa do que a tela mostrava, só a leitura mais
+compatível com os timestamps.
+
 **Desvio em vigor:** D-010 — Kernel produz a metadata declarativa desta fatia porque o agente
 `schema` não inicializa (P-15). Aplica-se às fatias (b) e (c): ambas chegaram prontas no working
 tree, produzidas pelo Kernel sob o mesmo desvio da fatia 1. Não se aplica à fatia (a): o Probe
