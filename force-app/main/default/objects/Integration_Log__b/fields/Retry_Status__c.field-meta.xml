@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Retry_Status__c</fullName>
+    <description>Situação da tentativa de retry desta operação, em texto (ex.: Pending, Exhausted, Not_Applicable).</description>
+    <label>Retry Status</label>
+    <length>20</length>
+    <required>false</required>
+    <type>Text</type>
+</CustomField>

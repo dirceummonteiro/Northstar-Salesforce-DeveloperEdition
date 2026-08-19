@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Parent_Correlation_Id__c</fullName>
+    <description>Id de correlação da PRIMEIRA tentativa da cadeia. Correlation_Id__c é único por tentativa porque compõe a chave primária; é este campo que agrupa as tentativas da mesma operação lógica e permite calcular o número de tentativas (§27.6). Sem ele a cadeia de retry não é reconstruível.</description>
+    <label>Parent Correlation Id</label>
+    <length>36</length>
+    <required>false</required>
+    <type>Text</type>
+</CustomField>

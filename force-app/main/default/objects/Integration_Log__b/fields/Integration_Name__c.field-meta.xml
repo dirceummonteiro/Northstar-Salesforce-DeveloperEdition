@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Integration_Name__c</fullName>
+    <description>Nome lógico da integração (ex.: ERP_Order_Sync, Inventory_Check, Credit_Check). Primeiro campo do índice do Big Object. O índice de Big Object limita a soma dos campos Text a 100 caracteres, e esse teto é exclusivo: 64 aqui mais 36 de Correlation_Id__c somam exatamente 100 e a validação recusou (Deploy ID 0Affj00000NmAhNCAV). Reduzido para 60; 60 + 36 = 96, dentro do teto. O índice é imutável, então não se aumenta este valor depois.</description>
+    <label>Integration Name</label>
+    <length>60</length>
+    <required>true</required>
+    <type>Text</type>
+</CustomField>

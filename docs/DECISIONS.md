@@ -281,3 +281,98 @@ não precisaria ver. É um risco real e aceito conscientemente: a alternativa é
 aprovação que não mostra o que precisa aprovar. Se o modelo de sharing evoluir para regras por
 critério (§30.3), esta concessão deve ser reavaliada e possivelmente substituída por uma sharing
 rule que exponha só as oportunidades com pedido de desconto aberto.
+
+---
+
+## D-012 — Big Object `Integration_Log__b` (§1.5/§9.11), índice composto e o teto de 100 caracteres
+
+**Data:** 2026-08-19 · **Marco:** M1 (fatia (d)) · **Status:** aplicada
+
+Big Object é o mecanismo da §1.5 para observabilidade de integração de alto volume sem consumir
+os 5 MB de `DataStorageMB` da org (`AMBIENTE.md` §3), que já estão no teto de storage de
+registro comum. `Integration_Log__b` (17 campos) registra cada tentativa de chamada de
+integração — nome da integração, operação, objeto e registro afetados, payloads de request e
+response, status HTTP, resultado, contagem e status de retry, correlação com a tentativa
+original.
+
+**Decisão:** um único índice composto, `Integration_Log_Index`, na ordem
+`Integration_Name__c` (ASC) → `Event_Date__c` (DESC) → `Correlation_Id__c` (ASC).
+
+**Por quê esta ordem:** Big Object não tem índice secundário — só a chave primária declarada no
+`<indexes>`, e toda consulta contra Big Object precisa filtrar pelo prefixo do índice para não
+degradar para varredura completa. `Integration_Name__c` primeiro porque o caso de uso central do
+M10 (Integration Monitor LWC) é "mostrar os eventos recentes de uma integração específica", não
+"mostrar tudo". `Event_Date__c` em `DESC` como segundo campo ordena os eventos mais recentes
+primeiro dentro de cada integração, sem exigir `ORDER BY` explícito em cada consulta.
+`Correlation_Id__c` por último porque, como o índice de Big Object é a chave primária, ele
+precisa terminar num campo que torne cada linha única — sem isso, duas tentativas com o mesmo
+nome de integração e o mesmo instante (raro, mas possível em retry automático) se sobrescreveriam
+silenciosamente.
+
+**Limite de plataforma que só apareceu no deploy.** A soma do comprimento de todos os campos
+Text de um índice de Big Object não pode passar de 100 caracteres, e esse teto se mostrou
+**exclusivo na prática**, não inclusivo:
+
+1. O desenho original tinha `Integration_Name__c` em 80 mais `Correlation_Id__c` em 36 = 116, e
+   a validação foi recusada (Deploy ID `0Affj00000NlcCiCAJ`, nada chegou a ser criado na org).
+2. `Integration_Name__c` caiu para 64: 64 + 36 = 100, o que parecia o teto exato. A validação foi
+   recusada de novo, com a mesma mensagem (Deploy ID `0Affj00000NmAhNCAV`) — a soma exatamente
+   igual a 100 não passa. O teto de plataforma é `< 100`, não `<= 100`.
+3. `Integration_Name__c` caiu para 60: 60 + 36 = 96. Validação aceita (`0Affj00000NmAkbCAF`,
+   111/111 componentes, 3/3 testes), deploy aplicado (`0Affj00000NliQBCAZ`).
+
+Nem esta revisão nem o parecer do Pulse tinham esse limite: ele não aparece na documentação que
+conseguimos alcançar e só se manifesta na validação. **`Integration_Name__c` fica em Text(60)** —
+64 é seguro na teoria e não passa na prática desta org. Como o índice de Big Object é imutável,
+o orçamento restante (96 de 100, com folga deliberada de 4 depois de duas recusas) não é
+reaproveitável por um deploy futuro: aumentar qualquer um dos dois campos exige recriar o objeto.
+Registrado em `docs/releases/R04/known-limitations.md`, item (e).
+
+**Modelo de permissão — append-only, sem edição nem exclusão para ninguém:**
+`NDG_Integration_Admin` e `NDG_Salesforce_Admin_Extended` têm `Create`+`Read`;
+`NDG_RevOps` tem só `Read`. Nenhum dos três tem `Edit`, `Delete`, `ViewAllRecords` ou
+`ModifyAllRecords` sobre `Integration_Log__b` — confirmado por SOQL contra `ObjectPermissions`
+na org, não só no XML fonte.
+
+**Por quê:** um log de auditoria de integração que pode ser editado ou apagado por quem quer que
+o leia deixa de servir como evidência — a §1.5 pede rastreabilidade, e rastreabilidade exige
+imutabilidade do lado de quem só consome. RevOps lê para monitorar volume e taxa de erro; não
+precisa (e não deveria poder) alterar histórico. Só quem integra ou administra grava — e mesmo
+esses só criam, nunca editam ou apagam um registro já gravado, o que é consistente com o próprio
+Big Object: ele não tem operação de update nativa pela UI declarativa, então dar `Edit`/`Delete`
+seria conceder uma permissão que a plataforma nem exerceria da forma esperada.
+
+**Se estiver errado:** o índice imutável é o único risco real — se 60 caracteres se provarem
+curtos demais para algum nome de integração futuro, a correção é recriar o objeto (perda do
+histórico acumulado) ou introduzir um segundo campo de nome curto exclusivo para o índice. O
+modelo de permissão é conservador por desenho; afrouxar depois é reversível, apertar depois de
+já ter concedido `Edit` a alguém não é.
+
+---
+
+## D-013 — `manifest/package.xml` não é atualizado por esta fatia, por desenho da esteira
+
+**Data:** 2026-08-19 · **Marco:** M1 (fatia (d)) · **Status:** aplicada, com pendência registrada
+
+`manifest/package.xml` declara só `ApexClass: *`, versão 67.0 — nunca foi expandido para
+declarar os objetos, campos, Custom Metadata ou permission sets das fatias 1, (a), (b) e (c).
+`scripts/shell/validate.sh` e `scripts/shell/deploy.sh` (herdados do M0) usam
+`sf project deploy validate/start --source-dir force-app`, nunca `-x manifest/package.xml`. O
+Probe confirmou isso lendo os dois scripts nesta fatia: o manifesto não está no caminho real do
+deploy desde o M0.
+
+**Decisão:** não editar `manifest/package.xml` nesta fatia nem em nenhuma anterior. Registrar a
+divergência entre o que o manifesto declara e o que o deploy de fato usa como
+`docs/releases/R04/known-limitations.md`, item já presente desde R01/R02/R03 sob rótulos
+diferentes, consolidado aqui.
+
+**Por quê:** editar o manifesto para "ficar correto" sem ele nunca ser lido pelo deploy real
+custaria trabalho de manutenção (17 campos, 1 índice, 1 objeto a mais a cada fatia) sem mudar
+nenhum comportamento observável — é documentação que finge ser configuração. A alternativa mais
+honesta é registrar que o manifesto está fora do caminho, não fingir que ele reflete o deploy.
+
+**Se estiver errado:** se algum dia a esteira migrar de `--source-dir` para `-x
+manifest/package.xml` (por exemplo, para deploy incremental por tipo de componente), o manifesto
+precisa ser reconstruído do zero a partir do `force-app/` real, porque hoje ele não acompanha
+nada além de `ApexClass`. Baixo custo agora, custo conhecido e adiado por decisão — não por
+descuido.

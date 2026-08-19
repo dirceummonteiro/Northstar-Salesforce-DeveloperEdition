@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <indexes>
+        <fullName>Integration_Log_Index</fullName>
+        <fields>
+            <name>Integration_Name__c</name>
+            <sortDirection>ASC</sortDirection>
+        </fields>
+        <fields>
+            <name>Event_Date__c</name>
+            <sortDirection>DESC</sortDirection>
+        </fields>
+        <fields>
+            <name>Correlation_Id__c</name>
+            <sortDirection>ASC</sortDirection>
+        </fields>
+        <label>Integration Log Index</label>
+    </indexes>
+    <label>Integration Log</label>
+    <pluralLabel>Integration Logs</pluralLabel>
+</CustomObject>

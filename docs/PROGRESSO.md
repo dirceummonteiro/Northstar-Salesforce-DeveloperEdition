@@ -127,12 +127,31 @@ Escopo do marco:
 - [x] Deploy aplicado, confirmado na org (objeto existe, vazio — sem seed nesta fatia)
 - [x] Pacote de evidência `docs/releases/R03/`
 
+**Fatia (d) entregue — Big Object `Integration_Log__b`** (evidência em `docs/releases/R04/`):
+
+- [x] Big Object `Integration_Log__b` (§1.5/§9.11, 17 campos), índice composto
+      `Integration_Name__c` (ASC) → `Event_Date__c` (DESC) → `Correlation_Id__c` (ASC) —
+      decisão completa e o teto de 100 caracteres do índice (exclusivo, não inclusivo) em
+      **D-012**, `docs/DECISIONS.md`
+- [x] `ObjectPermissions` nos 3 permission sets relevantes (`NDG_Integration_Admin`,
+      `NDG_RevOps`, `NDG_Salesforce_Admin_Extended`) — append-only, sem `Edit`/`Delete`/
+      `ViewAllRecords`/`ModifyAllRecords` para nenhum, `NDG_RevOps` sem `Create`; confirmado na
+      org via SOQL
+- [x] Duas recusas de validação por limite de plataforma antes da aceita (Deploy IDs
+      `0Affj00000NlcCiCAJ` e `0Affj00000NmAhNCAV`), documentadas em D-012 e em
+      `docs/releases/R04/known-limitations.md`, item (e)
+- [x] Deploy aplicado (`deploy quick` sobre validação própria do Probe), 111/111 componentes,
+      0 erros, 3/3 testes
+- [x] Confirmado na org: objeto + 17 campos via Tooling API `FieldDefinition`, índice via
+      retrieve de metadata, `COUNT()` não suportado em Big Object — confirmado vazio via
+      `SELECT ... LIMIT 1` sem registros
+- [x] Pacote de evidência `docs/releases/R04/`
+
 **Ainda falta para o M1 fechar** (§55 exige objetos, campos, relacionamentos e permission sets):
 
 - [ ] Demais objetos custom da §9 (`Sales_Quota__c`, `Quota_Attainment__c`,
       `Territory_Assignment__c`, `Inventory_Snapshot__c`, `ERP_Sync_Log__c`, `Partner_Deal__c`,
-      etc. — fora do escopo das fatias (b)/(c))
-- [ ] Big Object de observabilidade de integração (§1.5, não consome data storage)
+      etc. — fora do escopo das fatias (b)/(c)/(d))
 - [ ] Permission tests (`System.runAs()`) por persona (§30.2 os torna obrigatórios) — ainda sem
       lógica de negócio para exercitar; ver `docs/releases/R02/known-limitations.md`, item (c),
       reafirmado em `docs/releases/R03/known-limitations.md`, item (c)
@@ -144,4 +163,6 @@ Escopo do marco:
 `schema` não inicializa (P-15). Aplica-se às fatias (b) e (c): ambas chegaram prontas no working
 tree, produzidas pelo Kernel sob o mesmo desvio da fatia 1. Não se aplica à fatia (a): o Probe
 não teve visibilidade de qual agente produziu os permission sets, só confirmou que estavam
-corretos e os integrou.
+corretos e os integrou. Na fatia (d), foi o `schema` — não o Kernel — quem aplicou a correção de
+`Integration_Name__c` no working tree; ver observação em `docs/PENDENCIAS.md`, P-15. O Probe não
+declara o desvio D-010 encerrado por conta própria.

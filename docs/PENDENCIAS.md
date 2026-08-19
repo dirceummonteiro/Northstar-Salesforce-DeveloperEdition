@@ -44,6 +44,16 @@ o obstáculo é desenho de sharing, não compra de licença.
 | P-14 | Definir licença do projeto (o `README` está com "TBD") | Não | Dirceu |
 | P-15 | **Agente `schema` não inicializa** — `WorkspaceVanishedError` após o rename forge → schema | Não (Kernel cobre, D-010) | Helix |
 
+### P-15 — observação da fatia (d) do M1
+
+Na fatia (d) (`Integration_Log__b`, `docs/releases/R04/`), foi o próprio `schema` — não o Kernel
+— quem aplicou a correção de `Integration_Name__c` no working tree, entre a primeira recusa de
+validação (Deploy ID `0Affj00000NlcCiCAJ`) e a integração desta fatia. Isso é evidência de que o
+agente voltou a produzir metadata, mas o Probe não tem visibilidade de infraestrutura para
+confirmar se a inicialização foi corrigida de forma definitiva ou se foi uma execução pontual.
+**Não fecha P-15 nem reverte D-010** por conta própria — fica registrado para o Helix decidir se
+reavalia o desvio.
+
 ### P-10 — detalhe
 
 Nenhum agente consegue fazer isso daqui. A deploy key SSH autentica operações `git`, mas não a

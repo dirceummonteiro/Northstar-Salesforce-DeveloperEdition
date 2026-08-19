@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Correlation_Id__c</fullName>
+    <description>Id de correlação único por tentativa. Em Big Object o índice é a chave primária, então este valor é o que impede um registro de sobrescrever o outro. Terceiro campo do índice do Big Object. 36 é o tamanho exato de um UUID canônico com hifens; é campo de índice, e índice de Big Object é imutável — não se deixa folga inútil na chave.</description>
+    <label>Correlation Id</label>
+    <length>36</length>
+    <required>true</required>
+    <type>Text</type>
+</CustomField>
