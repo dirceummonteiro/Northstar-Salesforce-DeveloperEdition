@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description>Request for a discount beyond what the pricing policy grants, with its own lifecycle and approval trail. Operational record, not configuration, which is why it is a custom object and not Custom Metadata. Detail of Opportunity: the request has no meaning without the deal, cascade delete is the correct behaviour, and sharing inherited from the opportunity means whoever sees the deal sees the request.</description>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableHistory>true</enableHistory>
+    <enableReports>true</enableReports>
+    <enableSearch>true</enableSearch>
+    <enableStreamingApi>true</enableStreamingApi>
+    <label>Discount Request</label>
+    <nameField>
+        <displayFormat>DR-{00000}</displayFormat>
+        <label>Discount Request Number</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>Discount Requests</pluralLabel>
+    <sharingModel>ControlledByParent</sharingModel>
+</CustomObject>

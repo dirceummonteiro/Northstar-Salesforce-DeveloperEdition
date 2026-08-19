@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Requested_By__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>User who raised the request. Kept as data rather than relying on CreatedById so the requester survives a record created by an integration or by an admin on someone's behalf.</description>
+    <externalId>false</externalId>
+    <label>Requested By</label>
+    <referenceTo>User</referenceTo>
+    <relationshipLabel>Discount Requests (Requested By)</relationshipLabel>
+    <relationshipName>Discount_Requests_Requested</relationshipName>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

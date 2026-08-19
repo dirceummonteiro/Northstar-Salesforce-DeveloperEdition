@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Current_Approver__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>User the request is currently sitting with.</description>
+    <externalId>false</externalId>
+    <label>Current Approver</label>
+    <referenceTo>User</referenceTo>
+    <relationshipLabel>Discount Requests (Current Approver)</relationshipLabel>
+    <relationshipName>Discount_Requests_Approving</relationshipName>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>
