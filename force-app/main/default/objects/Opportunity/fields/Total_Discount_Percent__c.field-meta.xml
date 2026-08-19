@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Total_Discount_Percent__c</fullName>
+    <description>Aggregate discount granted across all line items measured against list price. Compared with the discount thresholds to decide which approval level a deal needs.</description>
+    <externalId>false</externalId>
+    <label>Total Discount Percent</label>
+    <precision>5</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackTrending>false</trackTrending>
+    <type>Percent</type>
+</CustomField>

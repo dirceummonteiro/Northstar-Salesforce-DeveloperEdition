@@ -171,3 +171,69 @@ mais os quatro arquivos de estado, que juntos são curtos.
 **Se estiver errado:** um especialista implementa contra uma seção que não leu. Mitigação: as
 tarefas do Helix citam seções explicitamente, e o gate do Probe + a aceitação do Helix pegam
 divergência de escopo antes do deploy.
+
+---
+
+## D-009 — Quote padrão em vez de modelo custom (ADR-008)
+
+**Data:** 2026-08-18 · **Marco:** M1, com efeito no M8 · **Status:** aplicada
+
+O objeto `Quote` padrão do Salesforce **não estava habilitado** nesta org — `SELECT COUNT() FROM
+Quote` retornava "sObject type 'Quote' is not supported".
+
+**Decisão:** habilitar o Quote padrão, via metadata:
+
+```xml
+<QuoteSettings>
+    <enableQuote>true</enableQuote>
+    <enableQuotesWithoutOppEnabled>false</enableQuotesWithoutOppEnabled>
+</QuoteSettings>
+```
+
+**Por quê:** a §9.1 já preferia o padrão e só autorizava um modelo custom "se não estiver
+habilitado/adequado". A investigação mostrou que não era indisponibilidade da Developer Edition —
+era só uma configuração desligada, acessível por deploy. Habilitando, o M8 ganha de graça
+`Quote`, `QuoteLineItem`, sincronização com a Opportunity, cálculo de totais e geração de PDF.
+Construir tudo isso como objeto custom seria dias de trabalho, mais superfície de bug, e ainda
+consumiria os 5 MB de storage que o objeto padrão não consome do mesmo jeito.
+
+`enableQuotesWithoutOppEnabled` fica `false`: no fluxo da §18 toda proposta nasce de uma
+oportunidade. Permitir proposta órfã abriria um caminho sem controle de preço nem aprovação.
+
+**Se estiver errado:** habilitar Quote é reversível, mas propostas já criadas ficam. Como o
+protótipo ainda não tem dado comercial, o custo de reverter hoje é zero.
+
+---
+
+## D-010 — Kernel assume metadata declarativa enquanto o agente Schema estiver quebrado
+
+**Data:** 2026-08-18 · **Marco:** M1 · **Status:** aplicada, temporária
+
+O agente `schema` **não inicializa**. Falha em ~100 ms com `WorkspaceVanishedError` apontando
+para `/home/shieldadmin/.openclaw/workspace-schema`. Reproduzido três vezes.
+
+Causa identificada: o agente foi renomeado de `forge` para `schema` (backup
+`rename-forge-schema-20260818T202235Z`). O rename moveu o workspace antigo — com o arquivo de
+estado dentro — para backup, e o novo ficou sem estado coerente. O runtime compara os hashes
+atestados com o que está no disco, não bate, e se recusa a re-semear por cima. **A trava está
+correta**: ela existe para não sobrescrever um workspace real com template em branco. O defeito
+é o estado que o rename deixou, não a proteção.
+
+**Decisão:** o **Kernel** assume a produção de metadata declarativa até o `schema` voltar. A §6.3
+permite ao Helix atribuir trabalho cross-domain de forma explícita, e é o que está sendo feito.
+Toda tarefa reatribuída diz no cabeçalho que é desvio, e o especialista confirma isso no relatório.
+
+**Por quê:** o `kernel` sobe normalmente (verificado com ping de leitura), e o modelo de dados já
+estava decidido e escrito por mim — o que faltava era digitar XML, não decidir arquitetura. Parar
+a entrega para consertar um agente seria trocar dias de progresso por uma questão de ferramenta.
+
+**O que NÃO muda:** o Probe continua sendo o único a commitar, empurrar e deployar (§65.1). O
+portão não se mexe. Só quem produz o arquivo mudou.
+
+**Quando reverter:** assim que o `schema` inicializar. O conserto provável é reiniciar o gateway,
+o que faz a inicialização reavaliar o estado do workspace do zero. Registrado em `PENDENCIAS.md`
+como P-15.
+
+**Se estiver errado:** o risco é o Kernel produzir metadata com vícios de quem pensa em Apex —
+por exemplo, resolver em código o que era para ser declarativo. Mitigação: as tarefas dele
+especificam campo a campo, e eu confiro os pontos sensíveis antes do Probe.

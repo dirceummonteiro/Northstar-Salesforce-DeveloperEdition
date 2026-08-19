@@ -42,6 +42,7 @@ o obstáculo é desenho de sharing, não compra de licença.
 | P-12 | Remover ou absorver `HttpCalloutService` quando a camada real de integração existir | Não | Bridge, no M9 |
 | P-13 | Runbook de reautenticação PKCE manual do Salesforce | Não | Probe, antes do M12 |
 | P-14 | Definir licença do projeto (o `README` está com "TBD") | Não | Dirceu |
+| P-15 | **Agente `schema` não inicializa** — `WorkspaceVanishedError` após o rename forge → schema | Não (Kernel cobre, D-010) | Helix |
 
 ### P-10 — detalhe
 

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Partner_Sourced__c</fullName>
+    <description>True when a partner brought this deal in rather than direct sales. Drives revenue attribution and keeps partner-originated pipeline out of the direct team's numbers.</description>
+    <defaultValue>false</defaultValue>
+    <externalId>false</externalId>
+    <label>Partner Sourced</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

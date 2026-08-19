@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Strategic_Account__c</fullName>
+    <description>Marks an account under executive sponsorship. Such accounts are held out of automated dormancy, reassignment and mass-notification routines.</description>
+    <defaultValue>false</defaultValue>
+    <externalId>false</externalId>
+    <label>Strategic Account</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

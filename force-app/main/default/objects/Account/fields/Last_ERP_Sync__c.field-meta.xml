@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Last_ERP_Sync__c</fullName>
+    <description>Moment the last successful ERP synchronization finished for this account. Used to detect stale credit and exposure data and to decide whether a fresh check is needed before an order.</description>
+    <externalId>false</externalId>
+    <label>Last ERP Sync</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>

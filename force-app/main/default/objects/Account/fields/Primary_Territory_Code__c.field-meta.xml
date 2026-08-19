@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Primary_Territory_Code__c</fullName>
+    <description>Code of the territory that owns this account for assignment and quota roll-up. Kept as a code rather than a lookup so ERP-driven loads do not need to resolve a Salesforce record first.</description>
+    <externalId>false</externalId>
+    <label>Primary Territory Code</label>
+    <length>10</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

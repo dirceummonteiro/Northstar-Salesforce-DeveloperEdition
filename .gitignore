@@ -20,9 +20,12 @@ deploy-options.json
 .env.*
 auth.json
 
-# --- Retrieve temporário / logs ---
+# --- Retrieve temporário / logs / artefatos de build ---
 **/unpackaged/
 *.log
+coverage/
+test-result*.json
+test-result*.txt
 
 # --- OpenClaw / workspace do agente (não faz parte do projeto) ---
 AGENTS.md

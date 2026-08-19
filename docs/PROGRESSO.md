@@ -45,7 +45,7 @@ Regra da §55: **entregar até o M8 impecável vale mais do que entregar os trez
 
 Cada marco fechado ganha uma entrada aqui, com data, commit e evidência.
 
-### M0 — Fundação (em andamento)
+### M0 — Fundação ✅
 
 **Aberto em:** 2026-08-18
 

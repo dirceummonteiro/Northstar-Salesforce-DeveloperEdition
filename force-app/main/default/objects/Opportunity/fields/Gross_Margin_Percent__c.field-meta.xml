@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Gross_Margin_Percent__c</fullName>
+    <description>Gross margin as a share of net revenue, written by the Apex pricing engine at the same moment as the amount. Checked against margin policy to decide whether Deal Desk review is required.</description>
+    <externalId>false</externalId>
+    <label>Gross Margin Percent</label>
+    <precision>5</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackTrending>false</trackTrending>
+    <type>Percent</type>
+</CustomField>

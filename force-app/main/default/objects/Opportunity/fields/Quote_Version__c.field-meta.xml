@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Quote_Version__c</fullName>
+    <description>Sequence number of the quote revision currently in front of the customer. Incremented every time a new revision is issued, so a customer question can be matched to the exact document they received.</description>
+    <externalId>false</externalId>
+    <label>Quote Version</label>
+    <precision>3</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

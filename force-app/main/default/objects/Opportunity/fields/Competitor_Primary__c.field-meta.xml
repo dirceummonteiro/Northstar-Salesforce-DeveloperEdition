@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Competitor_Primary__c</fullName>
+    <description>Main rival supplier the rep is up against in this deal, grouped by competitor type rather than by company name so win and loss rates stay comparable across regions.</description>
+    <externalId>false</externalId>
+    <label>Primary Competitor</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>None</fullName>
+                <default>true</default>
+                <label>None</label>
+            </value>
+            <value>
+                <fullName>Regional Distributor</fullName>
+                <default>false</default>
+                <label>Regional Distributor</label>
+            </value>
+            <value>
+                <fullName>National Competitor</fullName>
+                <default>false</default>
+                <label>National Competitor</label>
+            </value>
+            <value>
+                <fullName>Direct Manufacturer</fullName>
+                <default>false</default>
+                <label>Direct Manufacturer</label>
+            </value>
+            <value>
+                <fullName>Import Channel</fullName>
+                <default>false</default>
+                <label>Import Channel</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
