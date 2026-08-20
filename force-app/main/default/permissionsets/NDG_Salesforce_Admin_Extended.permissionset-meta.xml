@@ -52,7 +52,7 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Account.Seed_Key__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -62,12 +62,12 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Contact.Seed_Key__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Lead.Seed_Key__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -132,7 +132,7 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Opportunity.Seed_Key__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -142,37 +142,37 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>OpportunityLineItem.Seed_Key__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Order.Seed_Key__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>OrderItem.Seed_Key__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Pricebook2.Seed_Key__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Product2.Seed_Key__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Quote.Seed_Key__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>QuoteLineItem.Seed_Key__c</field>
         <readable>true</readable>
     </fieldPermissions>
