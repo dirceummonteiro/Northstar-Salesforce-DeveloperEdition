@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Capture_Channel__c</fullName>
+    <description>Canal pelo qual o lead entrou: Web (formulario de site), API (servico REST de captura), Import (carga em lote), Event (feira ou evento) e Manual (digitado por um usuario). O padrao e Manual porque e o unico canal em que existe uma pessoa na tela; todos os demais sao gravados explicitamente pela integracao que cria o registro. Nao e obrigatorio: um required aqui quebraria a captura externa.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Canal de origem da captura. Preenchido pela integracao; Manual quando digitado na tela.</inlineHelpText>
+    <label>Capture Channel</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Web</fullName>
+                <default>false</default>
+                <label>Web</label>
+            </value>
+            <value>
+                <fullName>API</fullName>
+                <default>false</default>
+                <label>API</label>
+            </value>
+            <value>
+                <fullName>Import</fullName>
+                <default>false</default>
+                <label>Import</label>
+            </value>
+            <value>
+                <fullName>Event</fullName>
+                <default>false</default>
+                <label>Event</label>
+            </value>
+            <value>
+                <fullName>Manual</fullName>
+                <default>true</default>
+                <label>Manual</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

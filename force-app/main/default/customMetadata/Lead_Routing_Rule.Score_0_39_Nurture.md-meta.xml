@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <label>Score 0 39 Nurture</label>
+    <protected>false</protected>
+    <values>
+        <field>Rule_Order__c</field>
+        <value xsi:type="xsd:double">30</value>
+    </values>
+    <values>
+        <field>Min_Score__c</field>
+        <value xsi:type="xsd:double">0</value>
+    </values>
+    <values>
+        <field>Max_Score__c</field>
+        <value xsi:type="xsd:double">39</value>
+    </values>
+    <values>
+        <field>Country__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Industry__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Target_Queue_Developer_Name__c</field>
+        <value xsi:type="xsd:string">Lead_Nurture</value>
+    </values>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+</CustomMetadata>

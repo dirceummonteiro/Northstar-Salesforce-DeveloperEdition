@@ -608,3 +608,85 @@ orçamento de execução, não folga.
 registrada como superada para esta org. D-020 fica ratificada.
 
 **Se estiver errado:** se a org ganhar storage no futuro, a decisão é revisitada.
+
+---
+
+## D-023 — Modelo de dados do Lead no M3: Lead padrão estendido, regras fora do código
+
+**Data:** 2026-08-20 · **Marco:** M3 (fatia M3.1) · **Status:** aplicada — decisão do Helix
+
+O M3 exige captura, scoring, roteamento e conversão de Lead. A primeira escolha é onde o lead
+mora: objeto custom próprio ou o `Lead` padrão da plataforma.
+
+**Decisão:** usar o `Lead` **padrão**, estendido com oito campos custom. Nenhum objeto custom de
+lead. As regras de scoring e de roteamento vivem em Custom Metadata Type — `Lead_Scoring_Rule__mdt`
+e `Lead_Routing_Rule__mdt` — e não em Apex. A deduplicação é por `Lead_Dedupe_Key__c`, External Id
+único e **case-insensitive**. **Nenhum campo novo é obrigatório.**
+
+**Por quê**, item a item:
+
+- **Lead padrão.** O critério de aceite do M3 é "um lead vira Account, Contact e Opportunity". A
+  conversão nativa (`Database.convertLead`), o mapeamento de campos, o `ConvertedAccountId` e o
+  relatório de funil são funcionalidade da plataforma, presa ao objeto padrão. Um objeto custom
+  obrigaria a reimplementar tudo isso em Apex — mais código, menos capacidade, sem ganho.
+- **Regras em Custom Metadata.** Mesmo princípio já aplicado em `Pricing_Rule__mdt` (D-011/M1):
+  mudar peso de scoring ou faixa de roteamento é mudança de *política*, e política não pode exigir
+  deploy de Apex. É também o que o CR-DEMO-001 da §69.2 vai exercitar no M13.
+- **Dedupe case-insensitive.** O mesmo e-mail chega `Joao@Example.com` do formulário web e
+  `joao@example.com` da API. Com `caseSensitive=true` a plataforma trataria os dois como leads
+  distintos e a deduplicação não deduplicaria nada. `Seed_Key__c` é case-sensitive por ser chave
+  técnica gerada por script; `Lead_Dedupe_Key__c` é o oposto — normaliza entrada humana.
+- **Nenhum campo obrigatório.** O lead entra por canal externo (formulário, API, carga). Um campo
+  `required` na camada de schema faz a plataforma recusar o insert, e a captura perde o lead sem
+  que ninguém veja. Onde houver regra de completude, ela é validação na aplicação, com mensagem, e
+  não um `required` que derruba a integração.
+
+**Escopo desta fatia:** oito campos em `Lead` (`Lead_Score__c`, `Lead_Score_Band__c`,
+`Capture_Channel__c`, `Lead_Dedupe_Key__c`, `Scored_At__c`, `Routed_At__c`, `Routing_Reason__c`,
+`Conversion_Blocked_Reason__c`), os dois Custom Metadata Types com 6 + 3 registros de exemplo, as
+três filas (`Lead_Enterprise`, `Lead_SMB`, `Lead_Nurture`) e a FLS correspondente nos permission
+sets `NDG_*` já existentes. Nenhum Apex — o Apex é da M3.2 em diante.
+
+**Se estiver errado:** os oito campos são aditivos e removíveis. O risco real e irreversível está
+em `Lead_Dedupe_Key__c`: se a chave nascer errada, a unicidade passa a recusar leads legítimos, e
+corrigir exige recalcular o campo em toda a base antes de mudar a regra. Por isso a normalização é
+decidida aqui, no schema, e não improvisada no Apex.
+
+---
+
+## D-024 — Padrão de trigger do projeto
+
+**Data:** 2026-08-20 · **Marco:** M3 (registrada na fatia M3.1, implementada na M3.2) ·
+**Status:** decidida, ainda não implementada
+
+O projeto não tem trigger nenhuma até aqui. A primeira nasce na M3.2, e o padrão precisa estar
+decidido **antes** dela, não depois — padrão de trigger definido em retrospecto vira reescrita.
+
+**Decisão:**
+
+1. **Uma trigger por objeto**, sem exceção. Duas triggers no mesmo objeto têm ordem de execução
+   indefinida pela plataforma, e o bug que isso gera não é reproduzível.
+2. **Zero lógica dentro da trigger.** O corpo dela só despacha para o handler do objeto.
+3. **Uma classe handler por objeto**, estendendo uma classe base `virtual TriggerHandler` com um
+   método por contexto (`beforeInsert`, `afterUpdate`, …).
+4. A base oferece **bypass nomeado** (desligar o handler pelo nome, para carga de dados e para
+   testes que não devem disparar a cadeia inteira) e **controle de recursão** (um handler não
+   reentra no mesmo contexto). Trigger que dispara trigger é bug silencioso: o sintoma aparece
+   como limite de governor estourado, longe da causa.
+5. **Regra de negócio em classes de serviço**, não no handler. O handler orquestra; o serviço
+   decide. Serviço é testável sem DML.
+6. **Zero SOQL e zero DML dentro de laço**, em qualquer camada. Todo código roda com 200 registros,
+   não com 1.
+7. Toda classe declara `with sharing`, `without sharing` ou `inherited sharing` **explicitamente**.
+   Nunca por omissão.
+
+**Por quê:** os erros que este padrão evita — recursão, ordem indefinida, governor limit — não
+aparecem em desenvolvimento com um registro. Aparecem em produção, com volume, e o custo de
+descobri-los lá é ordens de grandeza maior que o de estabelecer o padrão agora.
+
+**Escopo:** esta fatia (M3.1) **registra** a decisão e não escreve Apex nenhum. `TriggerHandler`,
+`LeadTriggerHandler` e `LeadTrigger` são entregáveis da M3.2.
+
+**Se estiver errado:** o padrão é convenção, não plataforma. Trocá-lo custa refatorar os handlers
+existentes — barato enquanto há um, caro depois de dez. É exatamente por isso que fica decidido
+com zero triggers no repositório.

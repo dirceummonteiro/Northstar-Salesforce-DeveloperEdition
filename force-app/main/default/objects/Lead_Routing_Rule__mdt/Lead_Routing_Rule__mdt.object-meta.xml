@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Regras de roteamento de Lead para fila, avaliadas em Apex depois do scoring. Vive em Custom Metadata para que remanejar faixa de pontuacao, pais, setor ou fila de destino seja mudanca de configuracao e nunca deploy de Apex.</description>
+    <label>Regra de Roteamento de Lead</label>
+    <pluralLabel>Regras de Roteamento de Lead</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

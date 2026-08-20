@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Points__c</fullName>
+    <description>Pontos somados a Lead_Score__c quando a regra casa. Aceita valor negativo, para que uma caracteristica desqualificadora reduza a pontuacao em vez de exigir uma regra separada.</description>
+    <externalId>false</externalId>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Points</label>
+    <precision>3</precision>
+    <required>true</required>
+    <scale>0</scale>
+    <type>Number</type>
+</CustomField>

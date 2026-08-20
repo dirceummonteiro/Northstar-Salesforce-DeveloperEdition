@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <label>Industry Technology</label>
+    <protected>false</protected>
+    <values>
+        <field>Rule_Order__c</field>
+        <value xsi:type="xsd:double">10</value>
+    </values>
+    <values>
+        <field>Field_API_Name__c</field>
+        <value xsi:type="xsd:string">Industry</value>
+    </values>
+    <values>
+        <field>Operator__c</field>
+        <value xsi:type="xsd:string">equals</value>
+    </values>
+    <values>
+        <field>Comparison_Value__c</field>
+        <value xsi:type="xsd:string">Technology</value>
+    </values>
+    <values>
+        <field>Points__c</field>
+        <value xsi:type="xsd:double">15</value>
+    </values>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Setor de tecnologia e o publico principal do produto: casa com o perfil de cliente ideal.</value>
+    </values>
+</CustomMetadata>

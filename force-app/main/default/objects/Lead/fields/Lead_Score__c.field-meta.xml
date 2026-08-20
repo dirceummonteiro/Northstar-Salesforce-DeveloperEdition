@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Lead_Score__c</fullName>
+    <description>Pontuacao de 0 a 100 calculada em Apex a partir das regras ativas de Lead_Scoring_Rule__mdt. Nao e preenchida pelo usuario: o valor e sempre resultado da execucao do motor de scoring, e mudar a regra no Custom Metadata muda a pontuacao sem deploy de Apex.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Pontuacao 0-100 calculada automaticamente. Somente leitura para o usuario.</inlineHelpText>
+    <label>Lead Score</label>
+    <precision>3</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

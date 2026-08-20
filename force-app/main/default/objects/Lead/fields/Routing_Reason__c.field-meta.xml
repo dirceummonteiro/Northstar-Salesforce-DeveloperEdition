@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Routing_Reason__c</fullName>
+    <description>Explicacao legivel de qual regra de Lead_Routing_Rule__mdt decidiu a fila deste lead e por que. Existe para que uma atribuicao contestada seja auditavel sem ler log nem Apex.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Qual regra de roteamento decidiu a fila deste lead.</inlineHelpText>
+    <label>Routing Reason</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

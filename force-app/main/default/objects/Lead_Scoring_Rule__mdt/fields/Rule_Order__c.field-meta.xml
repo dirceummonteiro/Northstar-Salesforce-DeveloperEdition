@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Rule_Order__c</fullName>
+    <description>Ordem de avaliacao da regra. O menor numero e avaliado primeiro, o que torna o resultado do scoring deterministico e reproduzivel.</description>
+    <externalId>false</externalId>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Rule Order</label>
+    <precision>3</precision>
+    <required>true</required>
+    <scale>0</scale>
+    <type>Number</type>
+</CustomField>

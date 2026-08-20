@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Lead_Dedupe_Key__c</fullName>
+    <caseSensitive>false</caseSensitive>
+    <description>Chave normalizada de deduplicacao, calculada em Apex: o e-mail em minusculas quando existe; sem e-mail, o nome da empresa normalizado somado ao pais. External Id e Unique, portanto a plataforma recusa o segundo lead com a mesma chave e o upsert da captura externa casa pelo registro existente em vez de duplicar. Case-insensitive de proposito, porque o mesmo e-mail chega com caixa diferente de cada canal.</description>
+    <externalId>true</externalId>
+    <inlineHelpText>Chave tecnica de deduplicacao calculada automaticamente. Nao editar manualmente.</inlineHelpText>
+    <label>Lead Dedupe Key</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

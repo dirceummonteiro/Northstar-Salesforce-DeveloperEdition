@@ -8,8 +8,9 @@ dados de verdade, regras de negócio configuráveis, integrações com falha e r
 segurança por persona, testes automatizados e deploy reproduzível — e provar que um time
 autônomo consegue projetar, implementar, revisar, testar, entregar e **manter** isso.
 
-> **Progresso: 0 / 13 marcos.** Acompanhe em [`docs/PROGRESSO.md`](docs/PROGRESSO.md).
-> O projeto está no M0 (fundação). Modelo de dados e features entram a partir do M1.
+> **Progresso: 3 / 13 marcos.** Acompanhe em [`docs/PROGRESSO.md`](docs/PROGRESSO.md).
+> Fundação, modelo de dados e massa de demonstração concluídos. O M3 — captura, scoring e
+> roteamento de lead — está em andamento, e é onde entra a primeira regra de negócio em Apex.
 
 ---
 

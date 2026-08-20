@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <label>Email Present</label>
+    <protected>false</protected>
+    <values>
+        <field>Rule_Order__c</field>
+        <value xsi:type="xsd:double">30</value>
+    </values>
+    <values>
+        <field>Field_API_Name__c</field>
+        <value xsi:type="xsd:string">Email</value>
+    </values>
+    <values>
+        <field>Operator__c</field>
+        <value xsi:type="xsd:string">is_not_blank</value>
+    </values>
+    <values>
+        <field>Comparison_Value__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Points__c</field>
+        <value xsi:type="xsd:double">10</value>
+    </values>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Sem e-mail nao ha como abordar o lead nem deduplicar por chave: a presenca dele vale pontos.</value>
+    </values>
+</CustomMetadata>

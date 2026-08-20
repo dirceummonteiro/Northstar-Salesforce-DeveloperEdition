@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Min_Score__c</fullName>
+    <description>Limite inferior da faixa de Lead_Score__c atendida pela regra, inclusivo. Vazio significa sem limite inferior.</description>
+    <externalId>false</externalId>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Min Score</label>
+    <precision>3</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <type>Number</type>
+</CustomField>

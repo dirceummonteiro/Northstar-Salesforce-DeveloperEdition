@@ -347,4 +347,40 @@ ratificado em D-022.
 Escopo do marco, conforme §55: "Lead: capture, scoring, routing, conversion". Critério de
 aceite: **um lead vira Account, Contact e Opportunity**.
 
-Nenhum trabalho feito ainda nesta fatia.
+**Decisão de modelo de dados: D-023** — o M3 usa o `Lead` **padrão** estendido, sem objeto custom
+de lead; regras de scoring e de roteamento em Custom Metadata Type e não em Apex; deduplicação por
+External Id único e case-insensitive; nenhum campo novo obrigatório, para não quebrar a captura
+externa. **Padrão de trigger: D-024**, decidido agora e implementado na M3.2.
+
+Decomposição do marco em fatias:
+
+| Fatia | Entregável | Status |
+|---|---|---|
+| **M3.1** | Schema do Lead: 8 campos custom, `Lead_Scoring_Rule__mdt` e `Lead_Routing_Rule__mdt` com registros de exemplo, 3 filas, FLS nos permission sets `NDG_*` | ✅ deployada, evidência em `docs/releases/R10/` |
+| **M3.2** | Framework de trigger (`TriggerHandler` base, `LeadTrigger`, `LeadTriggerHandler`) + motor de scoring lendo `Lead_Scoring_Rule__mdt` | ⬜ |
+| **M3.3** | Roteamento por fila lendo `Lead_Routing_Rule__mdt`, com `Routed_At__c` e `Routing_Reason__c` preenchidos | ⬜ |
+| **M3.4** | Conversão para Account, Contact e Opportunity, com `Conversion_Blocked_Reason__c` no caminho de recusa — **é esta fatia que prova o critério de aceite da §55** | ⬜ |
+| **M3.5** | Captura via REST (`Capture_Channel__c` = API) com deduplicação por `Lead_Dedupe_Key__c`, mais as classes de teste do marco | ⬜ |
+
+**Fatia M3.1 — schema do Lead** (metadata versionada e **deployada** em `helix-dev`):
+
+- [x] 8 campos custom em `Lead`, todos opcionais por desenho (D-023): `Lead_Score__c` (Number 3,0),
+      `Lead_Score_Band__c` (picklist Hot/Warm/Cold, sem padrão), `Capture_Channel__c` (picklist
+      Web/API/Import/Event/Manual, padrão Manual), `Lead_Dedupe_Key__c` (Text 255, External Id,
+      Unique, **case-insensitive**), `Scored_At__c`, `Routed_At__c` (DateTime),
+      `Routing_Reason__c`, `Conversion_Blocked_Reason__c` (Text 255)
+- [x] `Lead_Scoring_Rule__mdt` (7 campos) + 6 registros de exemplo, sem dado pessoal
+- [x] `Lead_Routing_Rule__mdt` (7 campos) + 3 registros: 70–100 → `Lead_Enterprise`,
+      40–69 → `Lead_SMB`, 0–39 → `Lead_Nurture`
+- [x] 3 filas de `Lead` (`Lead_Enterprise`, `Lead_SMB`, `Lead_Nurture`), **sem membros**, para que
+      o deploy não dependa de nenhum usuário existir na org
+- [x] FLS dos 8 campos nos 8 permission sets `NDG_*` já existentes. Os 6 campos calculados por
+      Apex ficam `readable=true`/`editable=false` em todos — usuário não edita resultado de
+      cálculo. `Capture_Channel__c` e `Lead_Dedupe_Key__c` recebem `editable=true` **só** em
+      `NDG_Integration_Admin` (integração) e `NDG_Salesforce_Admin_Extended` (opera o seed, por
+      D-021); nos outros 6, somente leitura
+- [x] Nenhum permission set novo criado; nenhum `View All` / `Modify All` reintroduzido (a
+      correção de `eaf8baf` segue intacta)
+- [x] Nenhum Apex nesta fatia — `TriggerHandler` e o motor de scoring são da M3.2 (D-024)
+- [x] Commit, `sf project deploy validate` e deploy — do Probe (§65.1), evidência em
+      `docs/releases/R10/`
