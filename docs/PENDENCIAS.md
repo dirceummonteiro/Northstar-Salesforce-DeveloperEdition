@@ -44,6 +44,7 @@ o obstáculo é desenho de sharing, não compra de licença.
 | P-14 | Definir licença do projeto (o `README` está com "TBD") | Não | Dirceu |
 | P-15 | **Agente `schema` não inicializa** — `WorkspaceVanishedError` após o rename forge → schema. **Resolvida em 2026-08-19** (ver nota abaixo e D-018) | Não — resolvida | Helix |
 | P-16 | `sf sobject describe` não reflete campos recém-deployados de forma confiável, mesmo fora de Big Object | Não (Tooling API resolve) | Probe |
+| P-17 | **`Seed_Key__c` não tem FLS em nenhum perfil** — só nos 8 permission sets `NDG_*`. Contornado com atribuição de permission set (D-021) | Não — contornado | `schema` produz, Probe deploya |
 
 ### P-16 — `sf sobject describe` truncado depois de deploy
 
@@ -56,6 +57,33 @@ fatia confirma que ele também aparece em `Discount_Request__c`, que é objeto c
 mostrou os campos completos nos dois casos, sem o mesmo atraso. **Regra prática para quem
 verificar campo por campo depois de um deploy: usar `FieldDefinition` via Tooling API, nunca
 `sf sobject describe` sozinho** — o describe local pode ler uma lacuna que não existe.
+
+### P-17 — `Seed_Key__c` invisível para quem roda o seed
+
+A fatia (a) do M2 concedeu FLS de `Seed_Key__c` **somente nos 8 permission sets `NDG_*`**
+(`readable=true`, `editable=false`). Nenhum perfil recebeu o campo, inclusive o de administrador
+do sistema. Campo deployado por Metadata API não ganha FLS de perfil sozinho — só ganha o que a
+metadata declarar.
+
+Efeito medido na fatia (b): `sf data query`, `sf sobject describe` e o Apex anônimo relatam todos
+`No such column 'Seed_Key__c' on entity 'Account'`, e o script de seed **não compila**. A Tooling
+API (`FieldDefinition`) mostra os 11 campos presentes o tempo todo. O campo existe; a FLS o
+esconde.
+
+**Contorno em vigor:** o permission set `NDG_Salesforce_Admin_Extended` foi atribuído ao usuário
+que roda o seed. Reversível apagando o `PermissionSetAssignment`. Registrado em D-021.
+
+**Correção definitiva:** FLS do campo no perfil, ou atribuição de permission set como parte
+declarada do procedimento. É metadata declarativa — do `schema` (D-018), deploy do Probe (§65.1).
+Não foi feita aqui para não reabrir o desvio que D-018 acabou de encerrar.
+
+**Relação com P-16:** o mesmo mecanismo explicaria o que P-16 registrou como "describe truncado"
+— campo deployado por Metadata API fica sem FLS, e tanto `describe` quanto SOQL passam pela FLS
+do usuário, relatando como inexistente um campo que está lá. Para `Seed_Key__c` isso está
+**provado** (atribuir o permission set fez o campo aparecer nos três canais). Para os campos de
+`Discount_Request__c` e `Integration_Log__b` da R05 é só a leitura mais provável: ninguém
+reverificou aqueles casos sob esta hipótese. Vale a pena o Probe reabrir P-16 com esse teste
+antes de tratar o describe como não confiável.
 
 ### P-15 — observação da fatia (d) do M1
 

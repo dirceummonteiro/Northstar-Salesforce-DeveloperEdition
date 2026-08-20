@@ -83,6 +83,31 @@ sf org login web --alias helix-dev --set-default
 `validate.sh` roda antes de todo deploy, sempre. Não existe sandbox nem scratch org neste
 projeto: o validate é o que separa um erro descoberto de uma org meio-aplicada.
 
+### Massa de demonstração
+
+Depois do deploy, para carregar os dados de demonstração:
+
+```bash
+# carregar (idempotente: rodar duas vezes não duplica nada)
+./scripts/shell/seed.sh
+
+# apagar a massa — DESTRUTIVO
+./scripts/shell/cleanup-seed.sh
+```
+
+Os dois aceitam `ORG_ALIAS` (default `helix-dev`).
+
+São **1.051 registros sintéticos** em 12 objetos — contas, contatos, leads, catálogo de produtos,
+tabelas de preço, oportunidades com linhas, propostas e pedidos. Todo registro carrega
+`Seed_Key__c` com o prefixo `NS-`, e é essa marca que torna a carga repetível e a limpeza segura:
+`cleanup-seed.sh` apaga **somente** o que tem a marca, nunca um objeto inteiro.
+
+Nenhum dado de pessoa real. E-mails só em `@example.com`, telefones no prefixo `5550`, nomes
+gerados por combinação indexada, nenhum documento gerado.
+
+Detalhes de operação, pré-requisito de permissão e orçamento de storage em
+[`scripts/apex/README.md`](scripts/apex/README.md).
+
 ---
 
 ## Estrutura
@@ -90,7 +115,7 @@ projeto: o validate é o que separa um erro descoberto de uma org meio-aplicada.
 ```
 force-app/main/default/   metadata da org: objetos, campos, Apex, LWC, flows, permission sets
 config/                   configuração de projeto
-data/                     datasets de seed determinísticos e idempotentes
+data/                     vazio — o seed é Apex, não arquivo de dados (D-015)
 docs/
   MASTER_SCOPE.md         fonte de verdade do escopo
   AMBIENTE.md             limites, licenças e edição medidos na org real
@@ -103,7 +128,9 @@ docs/
   testing/                estratégia de teste e matriz de regressão
   runbooks/               procedimentos operacionais
   releases/               pacote de evidências por marco
-scripts/                  automação: apex, dados, shell
+scripts/
+  apex/                   seed data e limpeza (Apex anônimo) + README de operação
+  shell/                  validate, deploy, test, seed, cleanup-seed
 manifest/                 manifestos de deploy
 ```
 

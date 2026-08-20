@@ -480,3 +480,97 @@ isso nunca mudou.
 
 **Se estiver errado:** se o `schema` voltar a falhar, o desvio para o Kernel pode ser reaberto
 como uma nova decisão. D-010 fica no histórico como registrada — decisão revogada não se apaga.
+
+---
+
+## D-019 — Onde a plataforma não aceita `upsert`, o seed casa por consulta e separa insert de update
+
+**Data:** 2026-08-20 · **Marco:** M2 (fatia (b)) · **Status:** aplicada
+
+D-015 definiu que o seed é Apex anônimo com `upsert` contra `Seed_Key__c`. Na implementação,
+seis objetos recusam o mecanismo: `Opportunity`, `Quote`, `Order`, `OpportunityLineItem`,
+`QuoteLineItem` e `OrderItem`. Neles, `Pricebook2Id`, `OpportunityId`, `QuoteId`, `OrderId`,
+`PricebookEntryId` e `Product2Id` são `createable` mas **não** `updateable` — confirmado por
+`sf sobject describe`, não suposto. Um `upsert` reenvia esses campos na segunda execução, o
+registro já existe, a operação vira update e a plataforma recusa.
+
+**Decisão:** manter `upsert ... Seed_Key__c` onde a plataforma aceita (`Account`, `Contact`,
+`Lead`, `Product2`, `Pricebook2`) e, nos seis objetos acima, consultar as chaves existentes por
+`Seed_Key__c` e separar a carga em dois DML: `insert` com o payload completo para o que é novo,
+`update` só com os campos mutáveis para o que já existe.
+
+**Por quê:** o critério de aceite do M2 é comportamental — "roda duas vezes sem duplicar" —, não
+uma exigência de qual verbo de DML usar. O contrato de D-015 (a chave de casamento é
+`Seed_Key__c`) continua intacto; o que muda é o mecanismo, e só onde a plataforma não deixa
+escolha. Alternativas foram descartadas: `Database.upsert(..., allOrNone=false)` engoliria as
+falhas em silêncio, e recriar as linhas a cada execução trocaria os Ids toda vez, o que quebra
+qualquer referência externa à massa.
+
+**Se estiver errado:** é reversível dentro do script, sem tocar em schema. `Seed_Key__c` continua
+sendo a chave independentemente do verbo de DML.
+
+---
+
+## D-020 — O volume do seed é 1.051 registros, não os ~1.620 da §33
+
+**Data:** 2026-08-20 · **Marco:** M2 (fatia (b)) · **Status:** aplicada, precisa de ratificação do Helix
+
+A §33 fixa uma tabela de ~1.620 registros e diz que o orçamento é obrigatório. A §55 exige, para
+o M2 fechar, **storage abaixo de 50%**. Os dois números não cabem na mesma org: 1.620 do seed +
+139 de amostra da Developer Edition (D-016) dão 1.759 registros × 2 KB ≈ 3.518 KB, ou **68,7%**
+de 5 MB. Cumprir a §33 à risca reprova o critério de aceite do próprio marco.
+
+**Decisão:** carregar 1.051 registros, mantendo as proporções e a cobertura de negócio da tabela
+da §33 (todos os 12 objetos, os 4 segmentos, as 4 famílias de produto, os 10 estágios do funil).
+Resultado medido: 1.190 registros no total, ~2.380 KB, **46,5%** — abaixo do portão de 50%.
+
+**Por quê:** D-017 já tinha estabelecido que 50% é o portão de fechamento do M2 e 70% é a parada
+de emergência de qualquer carga. Entre um número de tabela e um critério de aceite, vale o
+critério de aceite. Reduzir preservando proporção mantém o que a massa existe para demonstrar —
+busca, filtro e preço nos marcos seguintes — enquanto cortar objetos inteiros não manteria.
+
+**O que isto deixa de folga:** ~1.190 registros até o teto de ~2.380 da §1.5, que é a margem de
+que `RunLocalTests` precisa para criar e apagar dado a cada deploy.
+
+**Como mudar:** as constantes `N_*` no topo de cada etapa em `scripts/apex/`. Refaça a conta de
+storage antes de subir qualquer número.
+
+**Se estiver errado:** se o Helix decidir que a §33 vence a §55, é editar as constantes e rodar
+de novo — nenhuma mudança de schema. Mas então o M2 fecha em ~68,7% e o critério "storage abaixo
+de 50%" precisa ser explicitamente revogado, não ignorado.
+
+---
+
+## D-021 — O seed exige FLS de leitura em `Seed_Key__c`; a fatia (a) não a entregou
+
+**Data:** 2026-08-20 · **Marco:** M2 (fatia (b)) · **Status:** contornada, correção definitiva pendente
+
+A fatia (a) criou `Seed_Key__c` nos 11 objetos e concedeu FLS **somente nos 8 permission sets
+`NDG_*`**, com `readable=true, editable=false`. Nenhum *perfil* recebeu o campo — nem o de
+administrador do sistema, que é quem roda o seed. Consequência medida: `sf data query`,
+`sf sobject describe` e o Apex anônimo relatam todos `No such column 'Seed_Key__c' on entity
+'Account'`, e o script **nem compila**. O campo existe na org o tempo todo; a Tooling API
+(`FieldDefinition`) mostra os 11. É a FLS do usuário que o esconde.
+
+Isto é fácil de ler errado como "o deploy da fatia (a) não chegou na org". Não é: chegou.
+
+**Decisão:** destravar atribuindo o permission set `NDG_Salesforce_Admin_Extended` ao usuário que
+roda o seed. É reversível (apagar o `PermissionSetAssignment`), não é deploy e não altera
+metadata versionada.
+
+**Por quê:** era o menor movimento capaz de destravar a fatia (b) sem invadir escopo alheio. FLS
+em perfil é metadata declarativa, portanto do `schema` (D-018), e quem deploya é o Probe (§65.1).
+Produzir essa metadata aqui seria reabrir o desvio que D-018 acabou de encerrar.
+
+**Nota sobre `editable=false`:** DML em Apex roda em modo de sistema e ignora FLS de escrita, então
+o seed grava normalmente. O que a FLS bloqueia é a *visibilidade* — e visibilidade é o que a
+compilação do Apex anônimo exige. Ou seja: `readable` é o suficiente, e `editable=false` continua
+sendo a escolha certa para um campo técnico.
+
+**Pendência que isto cria:** enquanto a FLS não estiver no perfil, qualquer verificação do seed
+por CLI ou por Setup depende de o usuário ter um permission set `NDG_*` atribuído. Registrado em
+`docs/PENDENCIAS.md`.
+
+**Se estiver errado:** se o Helix preferir que nenhum perfil enxergue o campo, a atribuição de
+permission set vira parte documentada do procedimento de seed em vez de um contorno temporário —
+e este registro passa de "pendente" a "definitiva".

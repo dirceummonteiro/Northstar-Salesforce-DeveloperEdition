@@ -223,6 +223,47 @@ A §33 exige, para este marco:
       (**D-018**)
 - [x] Pacote de evidência `docs/releases/R07/`
 
-**Ainda falta para o M2 fechar** (§33, §55): a carga dos ~1.620 registros de seed (D-015,
-execução do Kernel), o script de limpeza correspondente (D-016), confirmação de dado 100%
-sintético, e reconfirmação de storage abaixo de 50% depois da carga real.
+**Fatia (b) entregue — scripts de seed e de limpeza** (execução do Kernel):
+
+- [x] Seed em Apex anônimo, em três etapas: `scripts/apex/seed_01_catalog.apex`,
+      `seed_02_customers.apex`, `seed_03_pipeline.apex`. Três arquivos e não um só porque
+      Apex anônimo tem teto de 32.000 caracteres por execução
+- [x] Relatório de contagem somente-leitura `scripts/apex/seed_99_report.apex` e script de
+      limpeza `scripts/apex/cleanup_seed.apex`
+- [x] Invólucros `scripts/shell/seed.sh` e `scripts/shell/cleanup-seed.sh`, na convenção que já
+      existia em `scripts/shell/`
+- [x] Documentação de operação em `scripts/apex/README.md`; seção "Massa de demonstração" no
+      `README.md` da raiz
+- [x] **1.051 registros** nos 12 objetos: Account 80, Contact 150, Lead 80, Product2 100,
+      Pricebook2 1, PricebookEntry 200, Opportunity 100, OpportunityLineItem 180, Quote 30,
+      QuoteLineItem 50, Order 30, OrderItem 50
+- [x] **Idempotência provada na org**: seed rodado duas vezes seguidas a partir de org limpa.
+      1ª execução inseriu os 1.051; 2ª inseriu **0** e atualizou os mesmos 1.051. As contagens
+      por objeto são idênticas (`diff` vazio entre os dois relatórios)
+- [x] **Storage: 46,5%** (1.190 registros × 2 KB = ~2.380 KB de 5.120 KB), abaixo do portão de
+      50% do M2 (D-017). Cada etapa checa storage antes de gravar e aborta sem gravar nada
+      acima de 70% (§33.2)
+- [x] Dado 100% sintético: e-mails só em `@example.com`, telefones no prefixo 5550, nomes de
+      empresa e pessoa gerados por combinação indexada, nenhum documento (CPF/CNPJ) gerado —
+      conferido por query, 0 contatos e 0 leads fora de `@example.com`
+- [x] Limpeza apaga **somente** `Seed_Key__c LIKE 'NS-%'`, na ordem filho → pai, e esvazia a
+      lixeira. Verificada: 1.051 apagados, 139 registros de amostra da Developer Edition
+      intactos (D-016)
+- [x] Cobertura de negócio para os marcos seguintes: 4 segmentos com 20 contas cada, 4 famílias
+      de produto com 25 itens cada, os 10 estágios do funil ocupados, pipeline de R$ 132,8 mi
+
+**Decisões tomadas nesta fatia:** **D-019** (onde a plataforma recusa `upsert`, o casamento é por
+consulta a `Seed_Key__c` com insert e update separados), **D-020** (volume é 1.051 e não os
+~1.620 da §33, porque os dois números não cabem sob o portão de 50% da §55), **D-021** (o seed
+exige FLS de leitura em `Seed_Key__c`, que a fatia (a) não concedeu a nenhum perfil; contornado
+com atribuição de permission set, correção definitiva pendente em P-17).
+
+**Ainda falta para o M2 fechar** (§33, §55):
+
+- [ ] Ratificação do Helix sobre **D-020** — a §33 manda ~1.620 registros e a §55 manda storage
+      abaixo de 50%; os dois não cabem na mesma org e o Kernel escolheu o critério de aceite.
+      Se o Helix decidir o contrário, o critério "storage abaixo de 50%" precisa ser
+      explicitamente revogado, não ignorado
+- [ ] Correção definitiva da FLS de `Seed_Key__c` (P-17 / D-021) — metadata declarativa do
+      `schema`, deploy do Probe
+- [ ] Commit e pacote de evidência da fatia (b) — do Probe (§65.1); o Kernel não commita
