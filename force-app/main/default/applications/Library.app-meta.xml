@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Standalone Lightning app for searching and browsing books via the Open Library API.</description>
+    <formFactors>Large</formFactors>
+    <label>Library</label>
+    <navType>Standard</navType>
+    <tabs>Library</tabs>
+    <tabs>standard-home</tabs>
+    <uiType>Lightning</uiType>
+</CustomApplication>
