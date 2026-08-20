@@ -10,7 +10,7 @@ marcos concluídos e validados
              13
 ```
 
-**Progresso: 1 / 13**
+**Progresso: 2 / 13**
 
 Este número só sobe. Progresso *dentro* de um marco não é progresso do projeto e não entra
 nesta conta. Quando este documento falar de um marco específico, ele diz explicitamente que é
@@ -23,7 +23,7 @@ sobre aquele marco.
 | # | Entregável | Validação | Status |
 |---|---|---|---|
 | **M0** | Estrutura sfdx, git na `main`, `.gitignore`, docs iniciais, deploy vazio validado | `sf project deploy validate` passa | ✅ concluído |
-| **M1** | Modelo de dados: objetos, campos, relacionamentos, permission sets | metadata no repositório e na org | 🔄 em andamento |
+| **M1** | Modelo de dados: objetos, campos, relacionamentos, permission sets | metadata no repositório e na org | ✅ concluído |
 | **M2** | Seed data repetível dentro do orçamento da §33 | roda duas vezes sem duplicar; storage abaixo de 50% | ⬜ |
 | **M3** | Lead: captura, scoring, roteamento, conversão | um lead vira Account, Contact e Opportunity | ⬜ |
 | **M4** | Pipeline de Opportunity com produtos e price book | uma oportunidade completa pode ser montada | ⬜ |
@@ -73,7 +73,7 @@ Escopo do marco:
 
 **Fechamento:** 2026-08-18 · commit `d115424` · evidência em `docs/releases/R00/`
 
-### M1 — Modelo de dados (em andamento)
+### M1 — Modelo de dados ✅
 
 **Aberto em:** 2026-08-18
 
@@ -180,3 +180,18 @@ não teve visibilidade de qual agente produziu os permission sets, só confirmou
 corretos e os integrou. Na fatia (d), foi o `schema` — não o Kernel — quem aplicou a correção de
 `Integration_Name__c` no working tree; ver observação em `docs/PENDENCIAS.md`, P-15. O Probe não
 declara o desvio D-010 encerrado por conta própria.
+
+**Fechamento:** 2026-08-19 · commit `5d7d4ec` · evidência em `docs/releases/R01/` a `R05/` · go/no-go do Helix: **GO**
+
+### M2 — Seed data (não iniciado)
+
+**Aberto em:** 2026-08-19
+
+A §33 exige, para este marco:
+
+- [ ] ~1.620 registros no total, distribuídos pelos objetos do modelo de dados do M1
+- [ ] Script de carga repetível e idempotente (roda duas vezes sem duplicar)
+- [ ] Script de limpeza correspondente
+- [ ] Dado 100% sintético — nenhum dado de pessoa real
+- [ ] Verificação de storage antes de carregar, contra o teto de `DataStorageMB` medido em
+      `docs/AMBIENTE.md` §2.2 (0 MB de 5 MB em uso ao fechar o M1 — ver `docs/releases/R06/`)
