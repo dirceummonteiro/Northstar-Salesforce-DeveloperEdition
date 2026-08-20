@@ -1,6 +1,6 @@
 # Runbook — Custom Metadata (registros `.md-meta.xml`)
 
-Origem: `docs/releases/R03/known-limitations.md`, item (f-1). Escrito para custar um minuto de
+Origem: `docs/archive/releases/R03/known-limitations.md`, item (f-1). Escrito para custar um minuto de
 leitura em vez de uma hora de bisseção da próxima vez.
 
 ## O cabeçalho correto

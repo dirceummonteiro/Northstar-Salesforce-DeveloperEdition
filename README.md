@@ -8,9 +8,9 @@ dados de verdade, regras de negócio configuráveis, integrações com falha e r
 segurança por persona, testes automatizados e deploy reproduzível — e provar que um time
 autônomo consegue projetar, implementar, revisar, testar, entregar e **manter** isso.
 
-> **Progresso: 3 / 13 marcos.** Acompanhe em [`docs/PROGRESSO.md`](docs/PROGRESSO.md).
-> Fundação, modelo de dados e massa de demonstração concluídos. O M3 — captura, scoring e
-> roteamento de lead — está em andamento, e é onde entra a primeira regra de negócio em Apex.
+> **Projeto encerrado em 2026-08-20.** O escopo, o log de decisões e o histórico de entregas
+> estão em [`docs/archive/`](docs/archive/). O que já foi entregue continua no repositório e na
+> org; nada novo será construído.
 
 ---
 
@@ -25,8 +25,8 @@ sem plataforma: cliente fragmentado em várias planilhas, lead distribuído por 
 preço manual, desconto sem controle, margem vazando, Deal Desk lento, pedido digitado à mão e
 nenhuma visibilidade de estoque ou crédito na hora da venda.
 
-Escopo completo em [`docs/MASTER_SCOPE.md`](docs/MASTER_SCOPE.md) — 71 seções, fonte de verdade
-única do projeto.
+Escopo completo em [`docs/archive/MASTER_SCOPE.md`](docs/archive/MASTER_SCOPE.md) — 71 seções,
+fonte de verdade única do projeto enquanto ele existiu.
 
 ---
 
@@ -118,17 +118,19 @@ force-app/main/default/   metadata da org: objetos, campos, Apex, LWC, flows, pe
 config/                   configuração de projeto
 data/                     vazio — o seed é Apex, não arquivo de dados (D-015)
 docs/
-  MASTER_SCOPE.md         fonte de verdade do escopo
   AMBIENTE.md             limites, licenças e edição medidos na org real
-  DECISIONS.md            log de decisões do coordenador
-  PROGRESSO.md            marcos concluídos — a única régua de progresso
-  PENDENCIAS.md           o que foi adiado, e por quê
   adr/                    architecture decision records
   architecture/           visão de arquitetura e dicionário de dados
   integrations/           contratos de integração
   testing/                estratégia de teste e matriz de regressão
   runbooks/               procedimentos operacionais
-  releases/               pacote de evidências por marco
+  archive/                projeto encerrado: escopo, decisões, progresso e evidências
+    MASTER_SCOPE.md       fonte de verdade do escopo
+    MVP_LADDER_V4.md      plano de entrega V4
+    DECISIONS.md          log de decisões do coordenador
+    PROGRESSO.md          marcos concluídos
+    PENDENCIAS.md         o que foi adiado, e por quê
+    releases/             pacote de evidências por marco
 scripts/
   apex/                   seed data e limpeza (Apex anônimo) + README de operação
   shell/                  validate, deploy, test, seed, cleanup-seed
@@ -169,7 +171,7 @@ requisito → Helix decompõe e decide arquitetura
           → especialista implementa só o escopo dele
           → Probe valida com sf project deploy validate
           → Probe commita, faz push e deploya
-          → Probe registra evidência em docs/releases/
+          → Probe registra evidência em docs/archive/releases/
           → Helix aceita ou devolve
 ```
 
@@ -207,7 +209,7 @@ forks e caches de terceiros.
 O ERP, o serviço de estoque e o de crédito são **simulados** com mocks determinísticos — o
 objetivo é demonstrar o contrato, o tratamento de falha e o retry, não integrar com um sistema
 real. O portal do cliente, vendas por parceiro, contratos e renovações estão **adiados**, com
-motivo registrado em [`docs/PENDENCIAS.md`](docs/PENDENCIAS.md).
+motivo registrado em [`docs/archive/PENDENCIAS.md`](docs/archive/PENDENCIAS.md).
 
 ---
 
@@ -237,7 +239,7 @@ without Apex changes) and **all integration logs live in Big Objects** (a separa
 allocation).
 
 Git is the source of truth, the org is a deploy target, all work happens on `main`, and a single
-agent owns commits and deployments. Full scope in [`docs/MASTER_SCOPE.md`](docs/MASTER_SCOPE.md);
+agent owns commits and deployments. Full scope in [`docs/archive/MASTER_SCOPE.md`](docs/archive/MASTER_SCOPE.md);
 measured org limits in [`docs/AMBIENTE.md`](docs/AMBIENTE.md); architecture decisions in
 [`docs/adr/`](docs/adr/).
 

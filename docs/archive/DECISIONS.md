@@ -745,3 +745,45 @@ vazado por fora do `try/finally` é bug de produção difícil de reproduzir; ca
 backfill deixa duplicata silenciosa acumulando até alguém notar por fora do sistema; flag global de
 recursão bloqueia field update legítimo de um jeito que só aparece com volume. É por isso que ficam
 registradas como regra, amarradas a D-024, antes da M3.2 escrever a primeira linha de Apex.
+
+---
+
+## D-023 — A régua tem denominador 14, não 13
+
+**Data:** 2026-08-20 · **Marco:** transversal · **Status:** aplicada · **Corrige:** §55.1 do escopo
+
+A escada de marcos da §55 tem **14 linhas**: M0, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M11,
+M12 e M13. Contagem feita sobre o arquivo, não de cabeça.
+
+Mas a §55.1 define a métrica única com denominador **13**:
+
+```
+milestones completed and validated
+──────────────────────────────────
+                13
+```
+
+**Decisão: o denominador é 14.** O progresso atual passa a ser reportado como **3 / 14**.
+
+**Por quê:** o M0 é um marco de verdade. Tem entregável próprio ("estrutura sfdx, git na `main`,
+`.gitignore`, docs iniciais") e critério de validação próprio ("`sf project deploy validate`
+passa"), foi executado, validado e tem pacote de evidência (`docs/releases/R00/`). Excluí-lo da
+conta seria fingir que trabalho entregue e validado não conta. O `13` é erro de contagem por
+índice zero — quem escreveu leu "M13" como "treze marcos" —, não uma afirmação de que o M0 não
+vale.
+
+Mantido o denominador 13, o projeto terminaria reportando **14/13**. Uma régua que ultrapassa o
+próprio máximo não é régua.
+
+**O que NÃO muda:** o numerador. M0, M1 e M2 estão fechados, validados e com evidência. A
+correção mexe na escala, não no que foi entregue.
+
+**Sobre a regra "este número só sobe" da §55.1:** ela continua valendo e se refere ao numerador —
+a contagem de marcos concluídos. A fração em si diminui de 23% para 21% com esta correção, e isso
+é o esperado quando se conserta um denominador errado. O alternativa seria preservar um
+percentual inflado, que é o oposto do que a §55.1 quer.
+
+**Se estiver errado:** se a intenção original era mesmo excluir o M0 da conta, o número correto
+hoje seria 2/13 e não 3/14 — ou seja, eu estaria contando um marco a mais. Considerei e rejeitei:
+nada no escopo trata o M0 como preparação fora da escada, e ele aparece na mesma tabela, com o
+mesmo formato e o mesmo rigor de validação dos outros treze.

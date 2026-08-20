@@ -65,7 +65,7 @@ sf data query --target-org helix-dev --use-tooling-api \
 Isso foi contorno temporário até 2026-08-20 (**D-021**, P-17) e hoje é o
 procedimento declarado: a escrita em `Seed_Key__c` está na metadata versionada
 de `NDG_Salesforce_Admin_Extended`, não em atribuição improvisada. Ver **D-021**
-e a nota de P-17 em `docs/PENDENCIAS.md`.
+e a nota de P-17 em `docs/archive/PENDENCIAS.md`.
 
 ## Idempotência
 
