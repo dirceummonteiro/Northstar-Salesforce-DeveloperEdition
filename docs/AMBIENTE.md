@@ -1,11 +1,13 @@
-# AMBIENTE — Northstar Revenue Cloud Prototype
+# AMBIENTE — Helix Salesforce
 
-Fatos medidos da org e da estação de trabalho. **Não são estimativas.**
+Fatos medidos da org `helix-dev` e da estação de trabalho. **Não são estimativas.**
 Toda vez que este documento for atualizado, registre a data da medição.
 
-> Regra: quando o `MASTER_SCOPE.md` e uma medição real divergirem, o escopo continua mandando
-> no **que construir**; a medição manda nos **fatos da org**. Divergências ficam registradas
-> aqui e em `DECISIONS.md`.
+Não há projeto fixo. O time Helix trabalha por tarefas diretas do Dirceu, e estes limites
+valem para qualquer coisa que for construída aqui.
+
+> Regra: a medição manda nos **fatos da org**. Quando uma tarefa pedir algo que a medição
+> contradiz, a medição ganha — e a divergência fica registrada aqui, com data.
 
 ---
 
