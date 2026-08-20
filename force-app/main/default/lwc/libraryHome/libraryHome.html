@@ -1,0 +1,126 @@
+<template>
+    <div class="library-home">
+        <header class="library-header">
+            <div class="library-header__icon" aria-hidden="true">
+                <lightning-icon icon-name="utility:knowledge_base" size="small" variant="inverse"></lightning-icon>
+            </div>
+            <div class="library-header__text">
+                <h1 class="library-header__title">Library</h1>
+                <p class="library-header__tagline">Discover your next great read</p>
+            </div>
+        </header>
+
+        <div class="library-search">
+            <div class="library-search__field">
+                <lightning-input
+                    type="search"
+                    label="Search books"
+                    variant="label-hidden"
+                    placeholder="Search books by title or author..."
+                    value={searchTerm}
+                    onchange={handleSearchTermChange}
+                    onkeyup={handleSearchKeyUp}
+                ></lightning-input>
+            </div>
+            <lightning-button
+                variant="brand"
+                label="Search"
+                icon-name="utility:search"
+                onclick={handleSearchClick}
+                aria-label="Search books"
+                class="library-search__button"
+            ></lightning-button>
+        </div>
+
+        <section class="library-results">
+            <div class="library-results__header">
+                <div>
+                    <h2 class="library-results__title">{sectionTitle}</h2>
+                    <template if:truthy={sectionSubtitle}>
+                        <p class="library-results__subtitle">{sectionSubtitle}</p>
+                    </template>
+                </div>
+                <template if:true={showClearSearch}>
+                    <lightning-button
+                        variant="neutral"
+                        label="Clear search"
+                        icon-name="utility:close"
+                        onclick={handleClearSearch}
+                        aria-label="Clear search and show recommendations"
+                    ></lightning-button>
+                </template>
+            </div>
+
+            <template if:true={isLoading}>
+                <div class="library-state" role="status" aria-live="polite">
+                    <lightning-spinner alternative-text="Loading books" size="medium"></lightning-spinner>
+                </div>
+            </template>
+
+            <template if:true={hasError}>
+                <div class="library-state library-state--error" role="alert">
+                    <lightning-icon icon-name="utility:warning" size="medium" variant="warning"></lightning-icon>
+                    <p class="library-state__title">Something went wrong</p>
+                    <p class="library-state__message">{errorMessage}</p>
+                </div>
+            </template>
+
+            <template if:true={showEmptyState}>
+                <div class="library-state" role="status">
+                    <lightning-icon icon-name="utility:knowledge_base" size="large" class="library-state__icon"></lightning-icon>
+                    <p class="library-state__title">{emptyStateTitle}</p>
+                    <p class="library-state__message">{emptyStateMessage}</p>
+                </div>
+            </template>
+
+            <template if:true={hasBooks}>
+                <div class="library-grid">
+                    <template for:each={displayBooks} for:item="book">
+                        <div class="library-card" key={book.key}>
+                            <div class="library-card__cover">
+                                <template if:true={book.hasCover}>
+                                    <img
+                                        src={book.coverUrl}
+                                        alt={book.title}
+                                        class="library-card__cover-image"
+                                        loading="lazy"
+                                    />
+                                </template>
+                                <template if:false={book.hasCover}>
+                                    <div class="library-card__cover-placeholder" aria-hidden="true">
+                                        <lightning-icon icon-name="utility:notebook" size="medium" variant="inverse"></lightning-icon>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="library-card__body">
+                                <p class="library-card__title" title={book.title}>{book.title}</p>
+                                <template if:true={book.hasAuthors}>
+                                    <p class="library-card__authors" title={book.authors}>{book.authors}</p>
+                                </template>
+                                <div class="library-card__meta">
+                                    <template if:true={book.hasPublishYear}>
+                                        <span class="library-card__badge">{book.publishYear}</span>
+                                    </template>
+                                    <template if:true={book.hasEditionCount}>
+                                        <span class="library-card__badge library-card__badge--muted">{book.editionCountLabel}</span>
+                                    </template>
+                                </div>
+                                <template if:true={book.hasDetailUrl}>
+                                    <a
+                                        href={book.detailUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="library-card__link"
+                                        aria-label={book.detailAriaLabel}
+                                    >
+                                        View on Open Library
+                                    </a>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </section>
+    </div>
+</template>
