@@ -39,10 +39,13 @@ O alias da org sai de `ORG_ALIAS` (default `helix-dev`).
 
 ## Pré-requisito de permissão
 
-O usuário conectado precisa **enxergar `Seed_Key__c`**. A fatia (a) do M2
-entregou o campo com FLS apenas nos 8 permission sets `NDG_*`, e nenhum *perfil*
-o enxerga — nem o de administrador do sistema. Sem isso o Apex anônimo **não
-compila**:
+O usuário conectado precisa **enxergar `Seed_Key__c`**, e o procedimento de seed
+é rodar com o permission set **`NDG_Salesforce_Admin_Extended`** atribuído: é
+ele que concede leitura *e escrita* no campo nos 11 objetos. Os outros 7
+permission sets `NDG_*` concedem só leitura, para auditar a massa.
+
+Nenhum *perfil* enxerga o campo — nem o de administrador do sistema. Sem um
+permission set que o conceda, o Apex anônimo **não compila**:
 
 ```
 No such column 'Seed_Key__c' on entity 'Account'
@@ -59,9 +62,10 @@ sf data query --target-org helix-dev --use-tooling-api \
            WHERE EntityDefinition.QualifiedApiName = 'Account' AND QualifiedApiName = 'Seed_Key__c'"
 ```
 
-Destravar é atribuir um permission set `NDG_*` ao usuário que roda o seed. A
-correção definitiva — FLS do campo no perfil — é metadata declarativa, portanto
-do `schema`, e o deploy é do Probe (§65.1). Ver **D-019**.
+Isso foi contorno temporário até 2026-08-20 (**D-021**, P-17) e hoje é o
+procedimento declarado: a escrita em `Seed_Key__c` está na metadata versionada
+de `NDG_Salesforce_Admin_Extended`, não em atribuição improvisada. Ver **D-021**
+e a nota de P-17 em `docs/PENDENCIAS.md`.
 
 ## Idempotência
 

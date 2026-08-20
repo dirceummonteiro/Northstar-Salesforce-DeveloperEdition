@@ -543,7 +543,7 @@ de 50%" precisa ser explicitamente revogado, não ignorado.
 
 ## D-021 — O seed exige FLS de leitura em `Seed_Key__c`; a fatia (a) não a entregou
 
-**Data:** 2026-08-20 · **Marco:** M2 (fatia (b)) · **Status:** contornada, correção definitiva pendente
+**Data:** 2026-08-20 · **Marco:** M2 (fatia (b)) · **Status:** contorno encerrado em 2026-08-20 pela fatia (c) — ver nota final
 
 A fatia (a) criou `Seed_Key__c` nos 11 objetos e concedeu FLS **somente nos 8 permission sets
 `NDG_*`**, com `readable=true, editable=false`. Nenhum *perfil* recebeu o campo — nem o de
@@ -574,3 +574,37 @@ por CLI ou por Setup depende de o usuário ter um permission set `NDG_*` atribu�
 **Se estiver errado:** se o Helix preferir que nenhum perfil enxergue o campo, a atribuição de
 permission set vira parte documentada do procedimento de seed em vez de um contorno temporário —
 e este registro passa de "pendente" a "definitiva".
+
+**Encerramento (2026-08-20, fatia (c) do M2):** foi este o ramo escolhido. Nenhum perfil recebeu o
+campo; a atribuição de `NDG_Salesforce_Admin_Extended` a quem roda o seed é agora procedimento
+declarado, não contorno. Uma correção ao diagnóstico acima: as entradas de FLS não faltavam — a
+fatia (a) concedeu as 11 nos 8 permission sets, todas com `readable=true`. O que faltava era
+`editable=true` para quem opera a massa, agora concedido só em `NDG_Salesforce_Admin_Extended`.
+A nota "`editable=false` continua sendo a escolha certa" vale para os 7 permission sets de
+persona e segue em vigor neles; ela não vale para o permission set que opera o seed, porque
+qualquer manutenção da massa por CLI ou Data Loader — diferente do Apex anônimo, que roda em modo
+de sistema — passa pela FLS de escrita. P-17 fica corrigida na metadata versionada; falta o
+deploy, do Probe (§65.1).
+
+---
+
+## D-022 — Volume definitivo do seed data: 1.051 registros (ratifica D-020)
+
+**Data:** 2026-08-20 · **Marco:** M2 · **Status:** aplicada — decisão do Helix
+
+A §33 previa cerca de 1.620 registros. A §55 define como critério de aceite do M2 "storage abaixo
+de 50%". Os dois números não coexistem nesta org: Developer Edition, 5 MB, teto prático de
+aproximadamente 2.500 registros. 1.051 registros ocupam 46,5%; 1.620 estouram o teto.
+
+**Decisão:** entre o número da §33 e o critério de aceite da §55, prevalece o critério de aceite:
+é ele que valida o marco. O número da §33 é dimensionamento, não contrato.
+
+**Razão adicional, e mais importante:** o seed não é o fim. Os marcos M3 a M13 vão criar Leads,
+Opportunities, Quotes, Orders e registros em `Integration_Log__b` em cima dessa massa. Um seed que
+consome o orçamento inteiro de storage trava todos os marcos seguintes. Os 53,5% restantes são
+orçamento de execução, não folga.
+
+**Efeito:** 1.051 é o volume oficial do seed. A meta de aproximadamente 1.620 da §33 fica
+registrada como superada para esta org. D-020 fica ratificada.
+
+**Se estiver errado:** se a org ganhar storage no futuro, a decisão é revisitada.

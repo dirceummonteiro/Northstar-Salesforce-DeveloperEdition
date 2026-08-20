@@ -44,7 +44,7 @@ o obstáculo é desenho de sharing, não compra de licença.
 | P-14 | Definir licença do projeto (o `README` está com "TBD") | Não | Dirceu |
 | P-15 | **Agente `schema` não inicializa** — `WorkspaceVanishedError` após o rename forge → schema. **Resolvida em 2026-08-19** (ver nota abaixo e D-018) | Não — resolvida | Helix |
 | P-16 | `sf sobject describe` não reflete campos recém-deployados de forma confiável, mesmo fora de Big Object | Não (Tooling API resolve) | Probe |
-| P-17 | **`Seed_Key__c` não tem FLS em nenhum perfil** — só nos 8 permission sets `NDG_*`. Contornado com atribuição de permission set (D-021) | Não — contornado | `schema` produz, Probe deploya |
+| P-17 | **`Seed_Key__c` invisível para quem roda o seed** — contornado com atribuição de permission set (D-021). **Corrigida em 2026-08-20** na metadata versionada (ver nota abaixo); falta o deploy | Não — corrigida, deploy pendente | Probe deploya |
 
 ### P-16 — `sf sobject describe` truncado depois de deploy
 
@@ -70,12 +70,28 @@ Efeito medido na fatia (b): `sf data query`, `sf sobject describe` e o Apex anô
 API (`FieldDefinition`) mostra os 11 campos presentes o tempo todo. O campo existe; a FLS o
 esconde.
 
-**Contorno em vigor:** o permission set `NDG_Salesforce_Admin_Extended` foi atribuído ao usuário
-que roda o seed. Reversível apagando o `PermissionSetAssignment`. Registrado em D-021.
+**Contorno que estava em vigor:** o permission set `NDG_Salesforce_Admin_Extended` foi atribuído
+ao usuário que roda o seed. Registrado em D-021. Era `PermissionSetAssignment` — ação na org, não
+versionada; não deixou artefato no repositório.
 
-**Correção definitiva:** FLS do campo no perfil, ou atribuição de permission set como parte
-declarada do procedimento. É metadata declarativa — do `schema` (D-018), deploy do Probe (§65.1).
-Não foi feita aqui para não reabrir o desvio que D-018 acabou de encerrar.
+**Correção definitiva (2026-08-20, fatia (c) do M2):** o diagnóstico acima está parcialmente
+errado e fica registrado como estava para não reescrever a história. As entradas de FLS **não
+faltavam**: a fatia (a) concedeu as 11 entradas de `Seed_Key__c` nos 8 permission sets `NDG_*`,
+todas com `readable=true`. O que faltava era **escrita para quem opera o seed** — nenhum dos 8
+tinha `editable=true` — e a declaração de qual permission set é o do seed.
+
+`NDG_Salesforce_Admin_Extended` passou a ter `editable=true` nas 11 entradas de `Seed_Key__c`. Os
+outros 7 seguem com `editable=false`: leitura para auditar, escrita só no permission set que
+opera a massa. A atribuição desse permission set deixa de ser contorno e passa a ser parte
+declarada do procedimento de seed — o ramo "se estiver errado" de D-021.
+
+Validado com `sf project deploy validate` (Deploy ID `0Affj00000Npk8QCAR`, 1/1 componente, 3/3
+testes). **Deploy pendente, do Probe (§65.1).**
+
+**Achado colateral:** o mesmo permission set declarava `viewAllRecords`/`modifyAllRecords` em
+`Pricebook2` e `Product2`, que a licença do usuário não permite. Isso já reprovava a validação em
+HEAD, sem relação com P-17: o permission set não era deployável. Os flags foram para `false` e o
+CRUD integral foi preservado nos dois objetos.
 
 **Relação com P-16:** o mesmo mecanismo explicaria o que P-16 registrou como "describe truncado"
 — campo deployado por Metadata API fica sem FLS, e tanto `describe` quanto SOQL passam pela FLS

@@ -191,12 +191,20 @@ A §33 exige, para este marco:
 
 - [x] Chave técnica de idempotência (`Seed_Key__c`) em 11 dos 12 objetos do modelo de dados do
       M1 — ver fatia (a) abaixo
-- [ ] ~1.620 registros no total, distribuídos pelos objetos do modelo de dados do M1
-- [ ] Script de carga repetível e idempotente (roda duas vezes sem duplicar)
-- [ ] Script de limpeza correspondente
-- [ ] Dado 100% sintético — nenhum dado de pessoa real
-- [ ] Verificação de storage antes de carregar, contra o teto de `DataStorageMB` medido em
-      `docs/AMBIENTE.md` §2.2 (0 MB de 5 MB em uso ao fechar o M1 — ver `docs/releases/R06/`)
+- [x] Volume do seed: **1.051 registros** distribuídos pelos 12 objetos do modelo de dados do M1.
+      A meta de ~1.620 da §33 fica registrada como superada para esta org por **D-022**, que
+      ratifica D-020 — os dois números não coexistem sob o critério de aceite "storage abaixo de
+      50%" da §55, e os 53,5% restantes são orçamento de execução dos marcos M3 a M13
+- [x] Script de carga repetível e idempotente (roda duas vezes sem duplicar) — provado na org: a
+      2ª execução inseriu **0** e atualizou os mesmos 1.051 (`docs/releases/R08/`)
+- [x] Script de limpeza correspondente — `scripts/apex/cleanup_seed.apex`, verificado: 1.051
+      apagados, os 139 registros de amostra da Developer Edition intactos (D-016)
+- [x] Dado 100% sintético — nenhum dado de pessoa real; conferido por query, 0 contatos e 0 leads
+      fora de `@example.com`
+- [x] Verificação de storage antes de carregar, contra o teto de `DataStorageMB` medido em
+      `docs/AMBIENTE.md` §2.2 (0 MB de 5 MB em uso ao fechar o M1 — ver `docs/releases/R06/`).
+      Cada etapa checa antes de gravar e aborta sem gravar nada acima de 70% (§33.2); medição
+      final da carga: 46,5%
 
 **Fatia (a) entregue — chave de idempotência `Seed_Key__c`** (evidência em
 `docs/releases/R07/`):
@@ -258,12 +266,40 @@ consulta a `Seed_Key__c` com insert e update separados), **D-020** (volume é 1.
 exige FLS de leitura em `Seed_Key__c`, que a fatia (a) não concedeu a nenhum perfil; contornado
 com atribuição de permission set, correção definitiva pendente em P-17).
 
+**Fatia (c) entregue — correção definitiva de P-17** (metadata versionada, validada e não
+deployada):
+
+- [x] Diagnóstico corrigido: as entradas de FLS **não estavam faltando**. A fatia (a) já havia
+      concedido as 11 entradas de `Seed_Key__c` nos 8 permission sets `NDG_*`, todas com
+      `readable=true`. O que faltava era **escrita para quem roda o seed** — nenhum dos 8 tinha
+      `editable=true` — e a ausência de qualquer declaração de quem opera a massa
+- [x] `NDG_Salesforce_Admin_Extended` passa a ter `editable=true` nas 11 entradas de
+      `Seed_Key__c`. Os outros 7 permission sets `NDG_*` seguem com `editable=false`: leitura
+      para auditar, escrita só no permission set que opera o seed
+- [x] O contorno de D-021 era atribuição de permission set na org (`PermissionSetAssignment`),
+      ação manual não versionada — **não havia artefato no repositório para remover**. O que
+      existia era documentação descrevendo o contorno como vigente, em `scripts/apex/README.md`
+      e em `docs/PENDENCIAS.md`, atualizada nesta fatia
+- [x] Defeito pré-existente encontrado e corrigido no mesmo permission set: `Pricebook2` e
+      `Product2` declaravam `viewAllRecords`/`modifyAllRecords` como `true`, que a licença do
+      usuário não permite (`A licença do usuário não permite a autorização: Exibir todos os
+      Pricebook2`). **Isso já reprovava a validação em HEAD, sem relação com P-17** — o
+      permission set não era deployável. Os dois flags foram para `false`; CRUD integral
+      (`create`/`read`/`edit`/`delete`) preservado nos dois objetos
+- [x] `sf project deploy validate` — **Succeeded**, Deploy ID `0Affj00000Npk8QCAR`, 1/1
+      componente, 3/3 testes, 0 falhas. Validação apenas; o deploy é do Probe (§65.1)
+
+**Decisão desta fatia:** **D-022** ratifica D-020 — 1.051 é o volume oficial do seed, e a meta de
+~1.620 da §33 fica registrada como superada para esta org.
+
 **Ainda falta para o M2 fechar** (§33, §55):
 
-- [ ] Ratificação do Helix sobre **D-020** — a §33 manda ~1.620 registros e a §55 manda storage
-      abaixo de 50%; os dois não cabem na mesma org e o Kernel escolheu o critério de aceite.
-      Se o Helix decidir o contrário, o critério "storage abaixo de 50%" precisa ser
-      explicitamente revogado, não ignorado
-- [ ] Correção definitiva da FLS de `Seed_Key__c` (P-17 / D-021) — metadata declarativa do
-      `schema`, deploy do Probe
-- [ ] Commit e pacote de evidência da fatia (b) — do Probe (§65.1); o Kernel não commita
+- [x] Ratificação do Helix sobre **D-020** — ratificada por **D-022**. Entre o dimensionamento da
+      §33 e o critério de aceite da §55, prevalece o critério de aceite; e os 53,5% de storage
+      restantes são orçamento de execução dos marcos M3 a M13, não folga
+- [x] Correção definitiva da FLS de `Seed_Key__c` (P-17 / D-021) — feita na fatia (c) acima, na
+      metadata versionada, e validada contra a org
+- [x] Commit e pacote de evidência da fatia (b) — feitos: `2262199` (scripts de seed e de
+      limpeza) e `0b51c5f` (docs + evidência R08), ambos em `origin/main`
+- [ ] Deploy da fatia (c) e pacote de evidência correspondente — do Probe (§65.1); o Kernel
+      valida, não deploya nem commita
