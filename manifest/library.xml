@@ -7,6 +7,8 @@
     </types>
     <types>
         <members>Open_Library_Covers</members>
+        <members>Archive_Org</members>
+        <members>Archive_Org_Nodes</members>
         <name>CspTrustedSite</name>
     </types>
     <types>
