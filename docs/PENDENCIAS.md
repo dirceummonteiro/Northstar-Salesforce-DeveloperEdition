@@ -44,7 +44,7 @@ o obstáculo é desenho de sharing, não compra de licença.
 | P-14 | Definir licença do projeto (o `README` está com "TBD") | Não | Dirceu |
 | P-15 | **Agente `schema` não inicializa** — `WorkspaceVanishedError` após o rename forge → schema. **Resolvida em 2026-08-19** (ver nota abaixo e D-018) | Não — resolvida | Helix |
 | P-16 | `sf sobject describe` não reflete campos recém-deployados de forma confiável, mesmo fora de Big Object | Não (Tooling API resolve) | Probe |
-| P-17 | **`Seed_Key__c` invisível para quem roda o seed** — contornado com atribuição de permission set (D-021). **Corrigida em 2026-08-20** na metadata versionada (ver nota abaixo); falta o deploy | Não — corrigida, deploy pendente | Probe deploya |
+| P-17 | **`Seed_Key__c` invisível para quem roda o seed** — contornado com atribuição de permission set (D-021). **Fechada em 2026-08-20** (ver nota abaixo): metadata versionada, validada e deployada na org (`0Affj00000NpcVqCAJ`) | Não — fechada | Probe |
 
 ### P-16 — `sf sobject describe` truncado depois de deploy
 
@@ -86,7 +86,20 @@ opera a massa. A atribuição desse permission set deixa de ser contorno e passa
 declarada do procedimento de seed — o ramo "se estiver errado" de D-021.
 
 Validado com `sf project deploy validate` (Deploy ID `0Affj00000Npk8QCAR`, 1/1 componente, 3/3
-testes). **Deploy pendente, do Probe (§65.1).**
+testes).
+
+**Fechamento (2026-08-20):** deploy aplicado pelo Probe (§65.1) — Deploy ID
+`0Affj00000NpcVqCAJ`, 3/3 testes — e confirmado na org por SOQL/Tooling API direto contra
+`FieldPermissions`. Commits desta fatia: `da7d337` (concede `editable=true` em `Seed_Key__c` ao
+permission set do seed), `eaf8baf` (remove `viewAllRecords`/`modifyAllRecords` de `Pricebook2`/
+`Product2`), `737b8e8` e `ec845ec` (docs e pacote de evidência `docs/releases/R09/`). **P-17
+fechada.** Registro final do diagnóstico, para não reescrever a história: a causa original
+apontada — "FLS invisível para quem roda o seed" — estava parcialmente errada. As entradas de
+FLS de `Seed_Key__c` **existiam** nos 8 permission sets `NDG_*` desde a fatia (a) do M2, todas
+com `readable=true`. O que faltava não era a entrada, era `editable=true` — nenhum dos 8 tinha
+escrita concedida. A correção definitiva concede `editable=true` apenas em
+`NDG_Salesforce_Admin_Extended`; os outros 7 permanecem `editable=false` (leitura para auditar,
+escrita só no permission set que opera a massa).
 
 **Achado colateral:** o mesmo permission set declarava `viewAllRecords`/`modifyAllRecords` em
 `Pricebook2` e `Product2`, que a licença do usuário não permite. Isso já reprovava a validação em

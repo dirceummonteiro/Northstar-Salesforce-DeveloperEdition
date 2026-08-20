@@ -10,7 +10,7 @@ marcos concluídos e validados
              13
 ```
 
-**Progresso: 2 / 13**
+**Progresso: 3 / 13**
 
 Este número só sobe. Progresso *dentro* de um marco não é progresso do projeto e não entra
 nesta conta. Quando este documento falar de um marco específico, ele diz explicitamente que é
@@ -24,8 +24,8 @@ sobre aquele marco.
 |---|---|---|---|
 | **M0** | Estrutura sfdx, git na `main`, `.gitignore`, docs iniciais, deploy vazio validado | `sf project deploy validate` passa | ✅ concluído |
 | **M1** | Modelo de dados: objetos, campos, relacionamentos, permission sets | metadata no repositório e na org | ✅ concluído |
-| **M2** | Seed data repetível dentro do orçamento da §33 | roda duas vezes sem duplicar; storage abaixo de 50% | 🔄 em andamento |
-| **M3** | Lead: captura, scoring, roteamento, conversão | um lead vira Account, Contact e Opportunity | ⬜ |
+| **M2** | Seed data repetível dentro do orçamento da §33 | roda duas vezes sem duplicar; storage abaixo de 50% | ✅ concluído |
+| **M3** | Lead: captura, scoring, roteamento, conversão | um lead vira Account, Contact e Opportunity | 🔄 em andamento |
 | **M4** | Pipeline de Opportunity com produtos e price book | uma oportunidade completa pode ser montada | ⬜ |
 | **M5** | Motor de precificação em Custom Metadata | mudar regra de preço não exige mudar Apex | ⬜ |
 | **M6** | Controles de desconto e margem | desconto acima do limite é bloqueado com mensagem clara | ⬜ |
@@ -183,7 +183,7 @@ declara o desvio D-010 encerrado por conta própria.
 
 **Fechamento:** 2026-08-19 · commit `5d7d4ec` · evidência em `docs/releases/R01/` a `R05/` · go/no-go do Helix: **GO**
 
-### M2 — Seed data 🔄
+### M2 — Seed data ✅
 
 **Aberto em:** 2026-08-19
 
@@ -301,5 +301,50 @@ deployada):
       metadata versionada, e validada contra a org
 - [x] Commit e pacote de evidência da fatia (b) — feitos: `2262199` (scripts de seed e de
       limpeza) e `0b51c5f` (docs + evidência R08), ambos em `origin/main`
-- [ ] Deploy da fatia (c) e pacote de evidência correspondente — do Probe (§65.1); o Kernel
-      valida, não deploya nem commita
+- [x] Deploy da fatia (c) e pacote de evidência correspondente — aplicado pelo Probe (§65.1):
+      Deploy ID `0Affj00000NpcVqCAJ`, 3/3 testes, e pacote de evidência `docs/releases/R09/`
+
+**Deploy real da fatia (c)** (evidência em `docs/releases/R09/`):
+
+- [x] `sf project deploy start --source-dir force-app --test-level RunLocalTests` — Deploy ID
+      `0Affj00000NpcVqCAJ`, **Succeeded**, 3/3 testes
+- [x] Aplicação confirmada na org por SOQL/Tooling API direto contra `FieldPermissions` e
+      `ObjectPermissions`, não só pelo status do comando: `Seed_Key__c` editável em
+      `NDG_Salesforce_Admin_Extended`; `viewAllRecords`/`modifyAllRecords` de `Pricebook2` e
+      `Product2` em `false`, CRUD íntegro
+- [x] Reconciliação do volume do seed — 851 (11 objetos com `Seed_Key__c`) + 200
+      (`PricebookEntry` por parentesco com `Product2.Seed_Key__c`) = **1.051**, confirmando
+      D-022
+- [x] **Critério de aceite §55 — idempotência**: segunda execução de `./scripts/shell/seed.sh`
+      pós-deploy (quarta execução cumulativa) — **zero inserções em qualquer objeto**, todos os
+      1.051 registros apenas atualizados
+- [x] **Critério de aceite §55 — storage**: **46,5%** (1.190 registros × ~2 KB ≈ 2.380 KB de
+      5.120 KB), abaixo do teto de 50% (D-017) e da parada de emergência de 70% (§33.2)
+- [x] Defeito pré-existente em `main` encontrado e corrigido nesta fatia, sem relação com P-17:
+      `NDG_Salesforce_Admin_Extended` declarava `viewAllRecords`/`modifyAllRecords` em
+      `Pricebook2`/`Product2`, permissões que a licença Developer Edition não concede — isso já
+      reprovava `sf project deploy validate` em `HEAD` antes de qualquer mudança desta fatia,
+      confirmado de forma independente via `git stash`. Não estava em nenhuma pendência aberta;
+      achado por acidente ao validar P-17. Os dois flags foram para `false`, CRUD íntegro
+      preservado
+- [x] **ESCALONAMENTO DE SEGURANÇA reportado ao Helix** — mudança em permission set
+      (`NDG_Salesforce_Admin_Extended`): concede `editable=true` em `Seed_Key__c` e remove
+      `viewAllRecords`/`modifyAllRecords` de `Pricebook2`/`Product2`
+- [x] Pacote de evidência `docs/releases/R09/`
+
+**Go/no-go do Helix: GO.** Os dois critérios de aceite da §55 — roda duas vezes sem duplicar (0
+inserções na segunda execução) e storage abaixo do teto de 50% (medido em 46,5%) — estão
+provados ao vivo na org, pós-deploy, e o volume oficial do seed (1.051 registros) está
+ratificado em D-022.
+
+**Fechamento:** 2026-08-20 · commit `f77534e` · evidência em `docs/releases/R07/` a
+`docs/releases/R09/` · go/no-go do Helix: **GO**
+
+### M3 — Lead: captura, scoring, roteamento, conversão 🔄
+
+**Aberto em:** 2026-08-20
+
+Escopo do marco, conforme §55: "Lead: capture, scoring, routing, conversion". Critério de
+aceite: **um lead vira Account, Contact e Opportunity**.
+
+Nenhum trabalho feito ainda nesta fatia.
