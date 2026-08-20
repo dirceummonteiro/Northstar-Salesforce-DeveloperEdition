@@ -376,3 +376,107 @@ manifest/package.xml` (por exemplo, para deploy incremental por tipo de componen
 precisa ser reconstruído do zero a partir do `force-app/` real, porque hoje ele não acompanha
 nada além de `ApexClass`. Baixo custo agora, custo conhecido e adiado por decisão — não por
 descuido.
+
+---
+
+## D-014 — Chave de idempotência do seed é `Seed_Key__c`, não a chave de negócio
+
+**Data:** 2026-08-19 · **Marco:** M2 (fatia (a)) · **Status:** aplicada
+
+O critério de aceite do M2 é "roda duas vezes sem duplicar". A opção óbvia seria reaproveitar uma
+External Id já existente: `Account.ERP_Customer_Id__c` (External Id, unique) ou
+`Opportunity.External_Order_Id__c` (External Id, mas `unique=false` de propósito, porque é chave
+de integração, não de seed).
+
+**Decisão:** o seed usa um campo técnico dedicado em vez disso — `Seed_Key__c` (Text 40, External
+Id, Unique, case-sensitive), criado em `Account`, `Contact`, `Lead`, `Product2`, `Pricebook2`,
+`Opportunity`, `OpportunityLineItem`, `Quote`, `QuoteLineItem`, `Order` e `OrderItem`. Todo
+registro de seed carrega o prefixo `NS-` no valor.
+
+**Por quê:** chave de integração e chave de seed têm ciclos de vida diferentes; misturar as duas
+faria o script de limpeza do M2 apagar dado que um dia virá do ERP.
+
+**Consequência:** `PricebookEntry` não aceita campo custom e fica de fora desta lista — a
+idempotência dele é por chave natural (`Pricebook2Id` + `Product2Id`) no script Apex do Kernel.
+
+**Se estiver errado:** o campo é aditivo e não conflita com nenhuma External Id existente;
+ajustar `Seed_Key__c` depois é reversível enquanto não houver dado real gravado nele.
+
+---
+
+## D-015 — O seed é Apex anônimo com `upsert`, não `sf data import tree`
+
+**Data:** 2026-08-19 · **Marco:** M2 (fatia (a)) · **Status:** registrada, execução do Kernel
+
+**Decisão:** o script de seed do M2 é Apex anônimo usando `upsert` contra `Seed_Key__c` (e contra
+chave natural para `PricebookEntry`), não `sf data import tree`.
+
+**Por quê:** `sf data import tree` só faz `insert` — rodar duas vezes duplica, o que reprova o
+critério de aceite do M2 direto. Bulk CSV com upsert resolveria os objetos com External Id, mas
+não resolve os filhos sem campo custom, que precisam de consulta por chave natural antes de
+inserir. Apex anônimo é o único mecanismo que cobre os dois casos no mesmo script. O volume da
+§33 (~1.620 registros) cabe folgado nos limites de uma transação (10.000 linhas de DML, 50.000
+linhas de SOQL).
+
+**Se estiver errado:** trocar o mecanismo de carga é reescrever o script, não o modelo de dados —
+`Seed_Key__c` continua válido independentemente de como a carga é feita.
+
+---
+
+## D-016 — Os 139 registros de sample data da Developer Edition ficam onde estão
+
+**Data:** 2026-08-19 · **Marco:** M2 (fatia (a)) · **Status:** registrada, execução do Kernel/Probe
+
+A org já tinha 139 registros de exemplo (`Account`, `Contact`, `Lead`, `Product2`,
+`PricebookEntry`, `Opportunity`) antes do projeto.
+
+**Decisão:** o seed não toca nesses registros. O script de limpeza apaga **somente** registros
+com `Seed_Key__c` começando em `NS-`.
+
+**Por quê:** limpeza que apaga por objeto inteiro é destrutiva e irreversível numa org
+compartilhada; limpeza por marca (`NS-`) é reversível e auditável.
+
+**Consequência:** o orçamento de registros sobe para 1.759 (1.620 do seed + 139 de amostra),
+dentro dos ~2.380 da §1.5 — custo aceito.
+
+**Se estiver errado:** apagar os 139 manualmente depois é uma operação pontual e não depende de
+nenhuma decisão de schema.
+
+---
+
+## D-017 — O portão de storage do M2 é 50%, e 70% continua sendo parada obrigatória
+
+**Data:** 2026-08-19 · **Marco:** M2 (fatia (a)) · **Status:** registrada
+
+A §33.2 manda parar e reportar acima de 70% de storage. O critério de aceite do M2 na §55 exige
+storage abaixo de 50%.
+
+**Decisão:** não é contradição, são dois portões com finalidades diferentes. 50% é o portão para
+o marco M2 fechar; 70% é a parada de emergência de qualquer carga, em qualquer marco. Vale o mais
+restritivo dos dois no contexto de cada um.
+
+**Se estiver errado:** ajustar qualquer um dos dois números é edição de processo, não de schema.
+
+---
+
+## D-018 — O agente `schema` volta a ser o dono da metadata declarativa; D-010 encerrada
+
+**Data:** 2026-08-19 · **Marco:** M2 (fatia (a)) · **Status:** aplicada
+
+D-010 desviou a metadata declarativa para o Kernel porque o `schema` não inicializava (P-15).
+
+**Decisão:** em 2026-08-19 o `schema` foi testado pelo Helix e respondeu: lê e escreve em
+`/home/shieldadmin/.openclaw/workspace-helix`, tem `sf` CLI 2.147.7 e enxerga a org `helix-dev`
+conectada. O desvio está encerrado, e esta fatia — os campos `Seed_Key__c` e a FLS
+correspondente — é a primeira metadata produzida por ele desde então.
+
+**Por quê:** a causa raiz registrada em D-010 (estado inconsistente deixado por um rename mal
+sucedido) some quando o gateway reinicializa e reavalia o workspace do zero — exatamente o
+"conserto provável" que D-010 já previa.
+
+**O que muda:** o `schema` volta a produzir toda metadata declarativa; o Kernel deixa de ser
+responsável por isso. O Probe continua sendo o único a commitar, empurrar e deployar (§65.1) —
+isso nunca mudou.
+
+**Se estiver errado:** se o `schema` voltar a falhar, o desvio para o Kernel pode ser reaberto
+como uma nova decisão. D-010 fica no histórico como registrada — decisão revogada não se apaga.

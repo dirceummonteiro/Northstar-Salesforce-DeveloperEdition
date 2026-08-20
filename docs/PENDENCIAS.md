@@ -42,7 +42,7 @@ o obstáculo é desenho de sharing, não compra de licença.
 | P-12 | Remover ou absorver `HttpCalloutService` quando a camada real de integração existir | Não | Bridge, no M9 |
 | P-13 | Runbook de reautenticação PKCE manual do Salesforce | Não | Probe, antes do M12 |
 | P-14 | Definir licença do projeto (o `README` está com "TBD") | Não | Dirceu |
-| P-15 | **Agente `schema` não inicializa** — `WorkspaceVanishedError` após o rename forge → schema | Não (Kernel cobre, D-010) | Helix |
+| P-15 | **Agente `schema` não inicializa** — `WorkspaceVanishedError` após o rename forge → schema. **Resolvida em 2026-08-19** (ver nota abaixo e D-018) | Não — resolvida | Helix |
 | P-16 | `sf sobject describe` não reflete campos recém-deployados de forma confiável, mesmo fora de Big Object | Não (Tooling API resolve) | Probe |
 
 ### P-16 — `sf sobject describe` truncado depois de deploy
@@ -66,6 +66,15 @@ agente voltou a produzir metadata, mas o Probe não tem visibilidade de infraest
 confirmar se a inicialização foi corrigida de forma definitiva ou se foi uma execução pontual.
 **Não fecha P-15 nem reverte D-010** por conta própria — fica registrado para o Helix decidir se
 reavalia o desvio.
+
+### P-15 — resolução (2026-08-19)
+
+**Resolvida.** O Helix testou o agente `schema` diretamente nesta rodada, antes de atribuir a
+fatia (a) do M2: leitura e escrita confirmadas em
+`/home/shieldadmin/.openclaw/workspace-helix`, `sf` CLI 2.147.7 disponível e a org `helix-dev`
+visível e conectada. O `schema` produziu esta própria fatia (campos `Seed_Key__c` e FLS
+correspondente) como evidência. Decisão de encerrar o desvio registrada em D-018 —
+`docs/DECISIONS.md`.
 
 ### P-10 — detalhe
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Seed_Key__c</fullName>
+    <caseSensitive>true</caseSensitive>
+    <description>Technical idempotency key for synthetic seed data (NS §33). Every record produced by the seed script carries this field with a value prefixed &quot;NS-&quot;, so the load can be run more than once without duplicating records. The field has no business meaning and must not be used in reports, list views, or business logic.</description>
+    <externalId>true</externalId>
+    <inlineHelpText>Technical seed-data idempotency key (NS- prefix). No business meaning.</inlineHelpText>
+    <label>Seed Key</label>
+    <length>40</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

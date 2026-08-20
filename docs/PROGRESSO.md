@@ -24,7 +24,7 @@ sobre aquele marco.
 |---|---|---|---|
 | **M0** | Estrutura sfdx, git na `main`, `.gitignore`, docs iniciais, deploy vazio validado | `sf project deploy validate` passa | ✅ concluído |
 | **M1** | Modelo de dados: objetos, campos, relacionamentos, permission sets | metadata no repositório e na org | ✅ concluído |
-| **M2** | Seed data repetível dentro do orçamento da §33 | roda duas vezes sem duplicar; storage abaixo de 50% | ⬜ |
+| **M2** | Seed data repetível dentro do orçamento da §33 | roda duas vezes sem duplicar; storage abaixo de 50% | 🔄 em andamento |
 | **M3** | Lead: captura, scoring, roteamento, conversão | um lead vira Account, Contact e Opportunity | ⬜ |
 | **M4** | Pipeline de Opportunity com produtos e price book | uma oportunidade completa pode ser montada | ⬜ |
 | **M5** | Motor de precificação em Custom Metadata | mudar regra de preço não exige mudar Apex | ⬜ |
@@ -183,15 +183,46 @@ declara o desvio D-010 encerrado por conta própria.
 
 **Fechamento:** 2026-08-19 · commit `5d7d4ec` · evidência em `docs/releases/R01/` a `R05/` · go/no-go do Helix: **GO**
 
-### M2 — Seed data (não iniciado)
+### M2 — Seed data 🔄
 
 **Aberto em:** 2026-08-19
 
 A §33 exige, para este marco:
 
+- [x] Chave técnica de idempotência (`Seed_Key__c`) em 11 dos 12 objetos do modelo de dados do
+      M1 — ver fatia (a) abaixo
 - [ ] ~1.620 registros no total, distribuídos pelos objetos do modelo de dados do M1
 - [ ] Script de carga repetível e idempotente (roda duas vezes sem duplicar)
 - [ ] Script de limpeza correspondente
 - [ ] Dado 100% sintético — nenhum dado de pessoa real
 - [ ] Verificação de storage antes de carregar, contra o teto de `DataStorageMB` medido em
       `docs/AMBIENTE.md` §2.2 (0 MB de 5 MB em uso ao fechar o M1 — ver `docs/releases/R06/`)
+
+**Fatia (a) entregue — chave de idempotência `Seed_Key__c`** (evidência em
+`docs/releases/R07/`):
+
+- [x] Campo `Seed_Key__c` (Text 40, External Id, Unique, case-sensitive) em 11 objetos:
+      `Account`, `Contact`, `Lead`, `Product2`, `Pricebook2`, `Opportunity`,
+      `OpportunityLineItem`, `Quote`, `QuoteLineItem`, `Order`, `OrderItem` — decisão completa em
+      **D-014**, `docs/DECISIONS.md`
+- [x] FLS somente-leitura (`readable=true`, `editable=false`) do campo nos 8 permission sets
+      `NDG_*` — 88 pares campo/permission set, nenhum com escrita concedida
+- [x] Nenhuma recusa de plataforma nos 11 objetos, inclusive nos três de maior risco
+      (`OpportunityLineItem`, `QuoteLineItem`, `OrderItem`) — `externalId`/`unique` aceitos sem
+      exceção
+- [x] `PricebookEntry` fica de fora por desenho (a plataforma não aceita campo custom nele);
+      idempotência dele será por chave natural no Apex do seed — ver
+      `docs/releases/R07/known-limitations.md`, item (a)
+- [x] Deploy aplicado (`deploy quick` sobre validação própria do Probe, `0Affj00000Nmmt9CAB` →
+      `0Affj00000NnBZmCAN`), 122/122 componentes, 0 erros, 3/3 testes na validação
+- [x] Confirmado na org via Tooling API `FieldDefinition` (não `sf sobject describe`, P-16): os
+      11 campos existem, `IsIndexed = true`, External Id + Unique Case Sensitive
+- [x] Storage medido pós-deploy: 0 MB / 5 MB (0%) — folga total dos portões de 50% (D-017) e 70%
+      (§33.2) preservada para a carga de dados da próxima fatia
+- [x] P-15 resolvida nesta rodada — primeira metadata produzida pelo `schema` desde então
+      (**D-018**)
+- [x] Pacote de evidência `docs/releases/R07/`
+
+**Ainda falta para o M2 fechar** (§33, §55): a carga dos ~1.620 registros de seed (D-015,
+execução do Kernel), o script de limpeza correspondente (D-016), confirmação de dado 100%
+sintético, e reconfirmação de storage abaixo de 50% depois da carga real.
