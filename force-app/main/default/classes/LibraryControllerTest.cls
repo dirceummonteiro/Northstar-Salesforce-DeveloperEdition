@@ -32,8 +32,8 @@ private class LibraryControllerTest {
             'A non-blank term should hit the search endpoint.'
         );
         Assert.isTrue(
-            mock.capturedEndpoint.contains('limit=24'),
-            'The controller should apply the default page size of 24.'
+            mock.capturedEndpoint.contains('limit=48'),
+            'The controller should apply the default page size of 24, over-fetched 2x.'
         );
     }
 
@@ -88,8 +88,8 @@ private class LibraryControllerTest {
             'The cover URL should reach the component ready to render.'
         );
         Assert.isTrue(
-            mock.capturedEndpoint.contains('limit=24'),
-            'The controller should apply the default page size of 24.'
+            mock.capturedEndpoint.contains('limit=48'),
+            'The controller should apply the default page size of 24, over-fetched 2x.'
         );
     }
 

@@ -22,6 +22,10 @@ public with sharing class LibraryService {
     private static final Integer DEFAULT_PAGE_SIZE = 24;
     private static final Integer MAX_PAGE_SIZE = 100;
 
+    // Works without artwork are dropped, so the API is asked for more than the
+    // page size to keep the grid full after filtering.
+    private static final Integer OVER_FETCH_FACTOR = 2;
+
     // Resolved once per transaction.
     private static String coversBaseUrl;
 
@@ -34,27 +38,29 @@ public with sharing class LibraryService {
      *
      * @param query     search term; a blank term still queries the API
      * @param limitSize page size; null or out of range falls back to 24
-     * @return matching books, or an empty list when the response carries no items
+     * @return matching books with a cover, or an empty list when none qualify
      */
     public static List<LibraryBook> searchBooks(String query, Integer limitSize) {
         String term = query == null ? '' : query.trim();
+        Integer pageSize = resolveLimit(limitSize);
         String endpoint =
             SEARCH_ENDPOINT +
             '?q=' + EncodingUtil.urlEncode(term, 'UTF-8') +
-            '&limit=' + resolveLimit(limitSize) +
+            '&limit=' + fetchLimit(pageSize) +
             '&fields=' + SEARCH_FIELDS;
-        return parseBooks(executeGet(endpoint), SEARCH_COLLECTION);
+        return parseBooks(executeGet(endpoint), SEARCH_COLLECTION, pageSize);
     }
 
     /**
      * Returns the daily trending works, used as the recommendation strategy.
      *
      * @param limitSize page size; null or out of range falls back to 24
-     * @return trending books, or an empty list when the response carries no items
+     * @return trending books with a cover, or an empty list when none qualify
      */
     public static List<LibraryBook> getRecommendations(Integer limitSize) {
-        String endpoint = TRENDING_ENDPOINT + '?limit=' + resolveLimit(limitSize);
-        return parseBooks(executeGet(endpoint), TRENDING_COLLECTION);
+        Integer pageSize = resolveLimit(limitSize);
+        String endpoint = TRENDING_ENDPOINT + '?limit=' + fetchLimit(pageSize);
+        return parseBooks(executeGet(endpoint), TRENDING_COLLECTION, pageSize);
     }
 
     private static String executeGet(String endpoint) {
@@ -75,13 +81,34 @@ public with sharing class LibraryService {
         return requested < 1 || requested > MAX_PAGE_SIZE ? DEFAULT_PAGE_SIZE : requested;
     }
 
+    /**
+     * Asks the API for more items than the caller wants, because works without a
+     * cover are discarded and would otherwise leave the grid short.
+     */
+    private static Integer fetchLimit(Integer pageSize) {
+        Integer requested = pageSize * OVER_FETCH_FACTOR;
+        return requested > MAX_PAGE_SIZE ? MAX_PAGE_SIZE : requested;
+    }
+
     // Single parser for both endpoints: the items of "docs" and "works" are identical.
-    private static List<LibraryBook> parseBooks(String responseBody, String collectionKey) {
+    private static List<LibraryBook> parseBooks(
+        String responseBody,
+        String collectionKey,
+        Integer pageSize
+    ) {
         List<LibraryBook> books = new List<LibraryBook>();
         String coversBase = getCoversBaseUrl();
         for (Object item : extractItems(responseBody, collectionKey)) {
-            if (item instanceof Map<String, Object>) {
-                books.add(LibraryBook.fromApiItem((Map<String, Object>) item, coversBase));
+            if (books.size() == pageSize) {
+                break;
+            }
+            if (!(item instanceof Map<String, Object>)) {
+                continue;
+            }
+            LibraryBook book = LibraryBook.fromApiItem((Map<String, Object>) item, coversBase);
+            // A card with only a placeholder adds nothing, so cover-less works are dropped.
+            if (String.isNotBlank(book.coverUrl)) {
+                books.add(book);
             }
         }
         return books;

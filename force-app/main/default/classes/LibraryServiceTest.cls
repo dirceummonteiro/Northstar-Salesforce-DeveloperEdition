@@ -23,15 +23,25 @@ private class LibraryServiceTest {
         '"first_publish_year":1937,"cover_i":14627509,"edition_count":481}' +
         ']}';
 
-    // Missing cover_i, missing author_name, missing first_publish_year, missing key,
-    // blank author entries and a non-object entry in the collection.
+    // Missing author_name, missing first_publish_year, missing key, blank author
+    // entries and a non-object entry. Every real entry carries a cover, so none
+    // is dropped by the cover filter.
     private static final String PARTIAL_FIELDS_BODY =
         '{"numFound":4,"docs":[' +
-        '{"key":"/works/OL1W","title":"No Cover Book","edition_count":3},' +
+        '{"key":"/works/OL1W","title":"No Author Book","cover_i":111,"edition_count":3},' +
         '{"key":"/works/OL2W","title":"Blank Authors","author_name":["",null,"Real Name"],' +
-        '"cover_i":null,"first_publish_year":null,"edition_count":null},' +
-        '{"title":"No Key Book"},' +
+        '"cover_i":222,"first_publish_year":null,"edition_count":null},' +
+        '{"title":"No Key Book","cover_i":333},' +
         '"this entry is not an object"' +
+        ']}';
+
+    // Two works with a cover, two without: only the covered ones may survive.
+    private static final String MIXED_COVERS_BODY =
+        '{"numFound":4,"docs":[' +
+        '{"key":"/works/OL10W","title":"Covered One","cover_i":101},' +
+        '{"key":"/works/OL11W","title":"No Cover At All","edition_count":2},' +
+        '{"key":"/works/OL12W","title":"Covered Two","cover_i":102},' +
+        '{"key":"/works/OL13W","title":"Explicit Null Cover","cover_i":null}' +
         ']}';
 
     // ---------------------------------------------------------------- search
@@ -88,8 +98,8 @@ private class LibraryServiceTest {
             'The term should be trimmed and URL encoded, got: ' + mock.capturedEndpoint
         );
         Assert.isTrue(
-            mock.capturedEndpoint.contains('limit=10'),
-            'An explicit valid page size should be honoured.'
+            mock.capturedEndpoint.contains('limit=20'),
+            'The API should be asked for twice the page size to offset dropped works.'
         );
         Assert.isTrue(
             mock.capturedEndpoint.contains(
@@ -135,16 +145,20 @@ private class LibraryServiceTest {
 
         Assert.areEqual(3, books.size(), 'The non-object entry should be skipped.');
 
-        LibraryBook noCover = books[0];
-        Assert.areEqual('OL1W', noCover.workId, 'Work id should still be extracted.');
-        Assert.isNull(noCover.coverUrl, 'A missing cover id should produce a null cover URL.');
+        LibraryBook noAuthor = books[0];
+        Assert.areEqual('OL1W', noAuthor.workId, 'Work id should still be extracted.');
+        Assert.areEqual(
+            EXPECTED_COVER_BASE + '/b/id/111-M.jpg',
+            noAuthor.coverUrl,
+            'The cover URL should be built from the cover id.'
+        );
         Assert.areEqual(
             'Unknown author',
-            noCover.authors,
+            noAuthor.authors,
             'A missing author_name should fall back to "Unknown author".'
         );
-        Assert.isNull(noCover.publishYear, 'A missing publish year should stay null.');
-        Assert.areEqual(3, noCover.editionCount, 'Edition count should still be mapped.');
+        Assert.isNull(noAuthor.publishYear, 'A missing publish year should stay null.');
+        Assert.areEqual(3, noAuthor.editionCount, 'Edition count should still be mapped.');
 
         LibraryBook blankAuthors = books[1];
         Assert.areEqual(
@@ -152,7 +166,6 @@ private class LibraryServiceTest {
             blankAuthors.authors,
             'Blank and null author entries should be dropped.'
         );
-        Assert.isNull(blankAuthors.coverUrl, 'An explicit null cover id should produce no URL.');
         Assert.isNull(blankAuthors.publishYear, 'An explicit null year should stay null.');
         Assert.isNull(blankAuthors.editionCount, 'An explicit null edition count should stay null.');
 
@@ -213,12 +226,84 @@ private class LibraryServiceTest {
         String hugeLimitEndpoint = mock.capturedEndpoint;
         Test.stopTest();
 
-        Assert.isTrue(nullLimitEndpoint.contains('limit=24'), 'A null limit should default to 24.');
-        Assert.isTrue(zeroLimitEndpoint.contains('limit=24'), 'A zero limit should default to 24.');
+        // The default page size is 24, and the API is asked for twice that.
+        Assert.isTrue(nullLimitEndpoint.contains('limit=48'), 'A null limit should default to 24.');
+        Assert.isTrue(zeroLimitEndpoint.contains('limit=48'), 'A zero limit should default to 24.');
         Assert.isTrue(
-            hugeLimitEndpoint.contains('limit=24'),
+            hugeLimitEndpoint.contains('limit=48'),
             'A limit above the maximum should default to 24.'
         );
+    }
+
+    @IsTest
+    static void overFetchIsCappedAtTheApiMaximum() {
+        CalloutMock mock = mockWith(200, '{"works":[]}');
+
+        Test.startTest();
+        LibraryService.getRecommendations(80);
+        Test.stopTest();
+
+        Assert.isTrue(
+            mock.capturedEndpoint.contains('limit=100'),
+            'Doubling 80 exceeds the API maximum, so the request should be capped at 100, got: ' +
+            mock.capturedEndpoint
+        );
+    }
+
+    // -------------------------------------------------------- cover filtering
+
+    @IsTest
+    static void searchBooksDropsWorksWithoutACover() {
+        mockWith(200, MIXED_COVERS_BODY);
+
+        Test.startTest();
+        List<LibraryBook> books = LibraryService.searchBooks('mixed', 24);
+        Test.stopTest();
+
+        Assert.areEqual(2, books.size(), 'Only the two works carrying a cover should survive.');
+        Assert.areEqual('Covered One', books[0].title, 'The first covered work should be kept.');
+        Assert.areEqual('Covered Two', books[1].title, 'The second covered work should be kept.');
+        for (LibraryBook book : books) {
+            Assert.isNotNull(book.coverUrl, 'A returned book must always carry a cover URL.');
+        }
+    }
+
+    @IsTest
+    static void getRecommendationsDropsWorksWithoutACover() {
+        mockWith(
+            200,
+            '{"works":[' +
+            '{"key":"/works/OL20W","title":"With Cover","cover_i":201},' +
+            '{"key":"/works/OL21W","title":"Without Cover"}' +
+            ']}'
+        );
+
+        Test.startTest();
+        List<LibraryBook> books = LibraryService.getRecommendations(24);
+        Test.stopTest();
+
+        Assert.areEqual(1, books.size(), 'The cover-less trending work should be dropped.');
+        Assert.areEqual('With Cover', books[0].title, 'Only the covered work should remain.');
+    }
+
+    @IsTest
+    static void resultsAreTrimmedToTheRequestedPageSize() {
+        mockWith(
+            200,
+            '{"docs":[' +
+            '{"key":"/works/OL30W","title":"One","cover_i":301},' +
+            '{"key":"/works/OL31W","title":"Two","cover_i":302},' +
+            '{"key":"/works/OL32W","title":"Three","cover_i":303}' +
+            ']}'
+        );
+
+        Test.startTest();
+        List<LibraryBook> books = LibraryService.searchBooks('trim', 2);
+        Test.stopTest();
+
+        Assert.areEqual(2, books.size(), 'Over-fetched extras beyond the page size should be cut.');
+        Assert.areEqual('One', books[0].title, 'Order should follow the API response.');
+        Assert.areEqual('Two', books[1].title, 'The third covered work should not be returned.');
     }
 
     // ------------------------------------------------------- error handling
