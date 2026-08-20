@@ -1,4 +1,4 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, api } from 'lwc';
 import searchBooks from '@salesforce/apex/LibraryController.searchBooks';
 import getRecommendations from '@salesforce/apex/LibraryController.getRecommendations';
 
@@ -6,6 +6,9 @@ const GENERIC_ERROR_MESSAGE =
     'We could not reach the library right now. Please try again in a moment.';
 
 export default class LibraryHome extends LightningElement {
+    // Configurable in App Builder; falls back to the default on a Custom Tab.
+    @api componentTitle = 'Library';
+
     searchTerm = '';
     books = [];
     isLoading = false;

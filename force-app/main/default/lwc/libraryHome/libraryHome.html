@@ -5,7 +5,7 @@
                 <lightning-icon icon-name="utility:knowledge_base" size="small" variant="inverse"></lightning-icon>
             </div>
             <div class="library-header__text">
-                <h1 class="library-header__title">Library</h1>
+                <h1 class="library-header__title">{componentTitle}</h1>
                 <p class="library-header__tagline">Discover your next great read</p>
             </div>
         </header>
@@ -36,7 +36,7 @@
             <div class="library-results__header">
                 <div>
                     <h2 class="library-results__title">{sectionTitle}</h2>
-                    <template if:truthy={sectionSubtitle}>
+                    <template if:true={sectionSubtitle}>
                         <p class="library-results__subtitle">{sectionSubtitle}</p>
                     </template>
                 </div>
