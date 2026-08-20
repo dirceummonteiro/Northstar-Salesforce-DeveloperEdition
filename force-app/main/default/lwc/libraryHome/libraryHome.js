@@ -7,7 +7,7 @@ const GENERIC_ERROR_MESSAGE =
 
 export default class LibraryHome extends LightningElement {
     // Configurable in App Builder; falls back to the default on a Custom Tab.
-    @api componentTitle = 'Library';
+    @api componentTitle = 'My Library';
 
     searchTerm = '';
     books = [];

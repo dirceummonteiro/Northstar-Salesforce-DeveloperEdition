@@ -11,7 +11,7 @@
     </targets>
     <targetConfigs>
         <targetConfig targets="lightning__AppPage,lightning__HomePage">
-            <property name="componentTitle" type="String" default="Library" label="Component Title" description="Title shown at the top of the component" />
+            <property name="componentTitle" type="String" default="My Library" label="Component Title" description="Title shown at the top of the component" />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>
