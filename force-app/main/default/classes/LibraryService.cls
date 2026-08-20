@@ -108,24 +108,36 @@ public with sharing class LibraryService {
 
     /**
      * Resolves the cover host from the Named Credential, falling back to the
-     * public host. The default is assigned first and only overwritten when the
-     * query returns a usable endpoint, so no statement is left unexecuted.
+     * public host. Resolved once per transaction.
      */
     private static String getCoversBaseUrl() {
         if (coversBaseUrl == null) {
-            String resolved = DEFAULT_COVERS_BASE;
-            for (NamedCredential credential : [
+            coversBaseUrl = resolveCoversBaseUrl([
                 SELECT Endpoint
                 FROM NamedCredential
                 WHERE DeveloperName = :COVERS_CREDENTIAL_NAME
                 LIMIT 1
-            ]) {
-                resolved = String.isBlank(credential.Endpoint)
-                    ? resolved
-                    : credential.Endpoint.trim().removeEnd('/');
-            }
-            coversBaseUrl = resolved;
+            ]);
         }
         return coversBaseUrl;
+    }
+
+    /**
+     * Picks the cover host from a Named Credential record, or falls back to the
+     * public host when none is available.
+     *
+     * Kept free of SOQL on purpose: NamedCredential is a setup object and is not
+     * visible to tests running with SeeAllData=false, so the query lives in the
+     * caller and the decision logic stays directly testable.
+     *
+     * @param credentials query result; may be empty
+     * @return usable cover host without a trailing slash
+     */
+    @TestVisible
+    private static String resolveCoversBaseUrl(List<NamedCredential> credentials) {
+        if (credentials.isEmpty() || String.isBlank(credentials[0].Endpoint)) {
+            return DEFAULT_COVERS_BASE;
+        }
+        return credentials[0].Endpoint.trim().removeEnd('/');
     }
 }

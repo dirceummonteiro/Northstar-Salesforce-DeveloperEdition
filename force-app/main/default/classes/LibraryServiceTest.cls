@@ -403,6 +403,68 @@ private class LibraryServiceTest {
         return mock;
     }
 
+    /**
+     * NamedCredential is a setup object and is invisible to tests running with
+     * SeeAllData=false, so the record is built in memory. Endpoint is not
+     * writable through the constructor, hence the JSON round trip.
+     */
+    private static NamedCredential buildCredential(String endpoint) {
+        return (NamedCredential) JSON.deserialize(
+            '{"Endpoint":' + JSON.serialize(endpoint) + '}',
+            NamedCredential.class
+        );
+    }
+
+    @IsTest
+    static void resolveCoversBaseUrlUsesNamedCredentialEndpoint() {
+        String resolved = LibraryService.resolveCoversBaseUrl(
+            new List<NamedCredential>{ buildCredential('https://covers.example.org') }
+        );
+
+        Assert.areEqual(
+            'https://covers.example.org',
+            resolved,
+            'The Named Credential endpoint should win over the default host.'
+        );
+    }
+
+    @IsTest
+    static void resolveCoversBaseUrlStripsTrailingSlash() {
+        String resolved = LibraryService.resolveCoversBaseUrl(
+            new List<NamedCredential>{ buildCredential('  https://covers.example.org/  ') }
+        );
+
+        Assert.areEqual(
+            'https://covers.example.org',
+            resolved,
+            'A trailing slash would produce a double slash in the cover URL.'
+        );
+    }
+
+    @IsTest
+    static void resolveCoversBaseUrlFallsBackWhenNoCredential() {
+        String resolved = LibraryService.resolveCoversBaseUrl(new List<NamedCredential>());
+
+        Assert.areEqual(
+            LibraryService.DEFAULT_COVERS_BASE,
+            resolved,
+            'An empty query result should fall back to the public cover host.'
+        );
+    }
+
+    @IsTest
+    static void resolveCoversBaseUrlFallsBackWhenEndpointIsBlank() {
+        String resolved = LibraryService.resolveCoversBaseUrl(
+            new List<NamedCredential>{ buildCredential('   ') }
+        );
+
+        Assert.areEqual(
+            LibraryService.DEFAULT_COVERS_BASE,
+            resolved,
+            'A blank endpoint should fall back to the public cover host.'
+        );
+    }
+
     private class CalloutMock implements HttpCalloutMock {
         private final Integer statusCode;
         private final String body;
