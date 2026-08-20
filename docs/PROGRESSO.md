@@ -384,3 +384,9 @@ Decomposição do marco em fatias:
 - [x] Nenhum Apex nesta fatia — `TriggerHandler` e o motor de scoring são da M3.2 (D-024)
 - [x] Commit, `sf project deploy validate` e deploy — do Probe (§65.1), evidência em
       `docs/releases/R10/`
+- [x] **ESCALONAMENTO DE SEGURANÇA revisado pelo Fable** — veredito **"aprovado com ressalva"**.
+      Duas ações imediatas aplicadas: `objectPermissions` de `Lead` adicionado a
+      `NDG_Integration_Admin` (a FLS de campo estava inerte sem ele) e `readable` de
+      `Lead_Dedupe_Key__c` removido de `NDG_Executive_ReadOnly` e `NDG_Deal_Desk` (dado pessoal
+      sem uso funcional nesses dois personas). Três regras de Apex para a M3.2 registradas em
+      D-025, emendando D-024. Correção documentada em `docs/releases/R10/`

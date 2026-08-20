@@ -690,3 +690,58 @@ descobri-los lá é ordens de grandeza maior que o de estabelecer o padrão agor
 **Se estiver errado:** o padrão é convenção, não plataforma. Trocá-lo custa refatorar os handlers
 existentes — barato enquanto há um, caro depois de dez. É exatamente por isso que fica decidido
 com zero triggers no repositório.
+
+---
+
+## D-025 — Parecer do Fable sobre o ESCALONAMENTO DE SEGURANÇA da M3.1: acatado, com três regras que emendam D-024
+
+**Data:** 2026-08-20 · **Marco:** M3 (fatia M3.1, correção aplicada antes da M3.2) ·
+**Status:** aplicada — parecer do Fable acatado integralmente pelo Helix
+
+O Fable revisou o ESCALONAMENTO DE SEGURANÇA da fatia M3.1 (FLS em 8 permission sets `NDG_*`,
+`docs/releases/R10/release-summary.md`) e devolveu **"aprovado com ressalva"**. O Helix acatou o
+parecer inteiro. Duas ações imediatas de permissão e três regras que emendam D-024 para a M3.2.
+
+**Ações imediatas de permissão (aplicadas nesta correção):**
+
+1. `NDG_Integration_Admin` não tinha `objectPermissions` de `Lead`. A FLS de campo que a M3.1
+   colocou nesse permission set era inerte sem o object permission correspondente — a persona de
+   integração não conseguia criar nem ler `Lead`, o que quebraria a captura da M3.2. Adicionado
+   `allowRead=true`, `allowCreate=true`, `allowEdit=true`, `allowDelete=false`,
+   `viewAllRecords=false`, `modifyAllRecords=false`.
+2. Removido `readable` de `Lead_Dedupe_Key__c` em `NDG_Executive_ReadOnly` e em `NDG_Deal_Desk`.
+   A chave guarda e-mail normalizado — dado pessoal — e é filtrável por SOQL. `Executive_ReadOnly`
+   consome funil agregado, não precisa da chave individual; `Deal_Desk` não trabalha `Lead`. Nos
+   dois casos a leitura era superfície de exposição sem uso funcional.
+
+Nada além disso mudou em permissão nesta correção — o Fable confirmou que o resto está conforme o
+desenho da M3.1 e que `View All`/`Modify All` não voltou em nenhum permission set.
+
+**Três regras que emendam D-024, obrigatórias a partir da M3.2 (Apex do Lead):**
+
+1. **O bypass nomeado do `TriggerHandler` é ativável só por código.** Nunca por custom setting,
+   custom permission ou qualquer mecanismo que um usuário final consiga ligar por conta própria.
+   O escopo do bypass é obrigatoriamente `try/finally`, para não vazar para o resto da transação
+   se o bloco lançar exceção, e a ativação é logada.
+2. **Carga com bypass ativo pula o cálculo de `Lead_Dedupe_Key__c`, e a chave nasce nula.** Como
+   `unique` em External Id aceita múltiplos nulos, o dedupe fica **silenciosamente desligado**
+   durante qualquer carga que rode com o bypass. Por isso, toda carga que usa o bypass exige
+   backfill da chave logo depois, como regra do processo — não como observação de rodapé.
+3. **Controle de recursão por `Set<Id>` de registros já processados no contexto da transação**,
+   nunca por flag booleana global. Flag global bloqueia re-execução legítima quando um field
+   update redispara o mesmo contexto de trigger para o mesmo registro por um motivo válido; o
+   `Set<Id>` distingue "já processei este registro" de "já entrei neste handler uma vez".
+
+**Por quê:** as duas ações de permissão fecham brechas que a M3.1 deixou — uma FLS inerte que
+quebraria a M3.2, e uma leitura de dado pessoal sem uso funcional em dois permission sets que não
+precisam dela. As três regras existem porque o bypass e a recursão são exatamente os dois pontos
+onde a M3.2 pode reintroduzir os problemas que D-024 já tinha nomeado (recursão, ordem indefinida)
+ou abrir um novo — dedupe desligado sem ninguém perceber — se a implementação não for restringida
+agora, antes do primeiro handler existir.
+
+**Se estiver errado:** as duas correções de permissão são reversíveis sem custo — mexem em FLS e
+object permission, nada de schema. As três regras de Apex custam caro se ignoradas depois: bypass
+vazado por fora do `try/finally` é bug de produção difícil de reproduzir; carga com bypass sem
+backfill deixa duplicata silenciosa acumulando até alguém notar por fora do sistema; flag global de
+recursão bloqueia field update legítimo de um jeito que só aparece com volume. É por isso que ficam
+registradas como regra, amarradas a D-024, antes da M3.2 escrever a primeira linha de Apex.
