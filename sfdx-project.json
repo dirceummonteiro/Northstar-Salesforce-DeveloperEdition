@@ -5,7 +5,7 @@
       "default": true
     }
   ],
-  "name": "Northstar",
+  "name": "helix-salesforce",
   "namespace": "",
   "sfdcLoginUrl": "https://login.salesforce.com",
   "sourceApiVersion": "67.0"
